@@ -37,10 +37,12 @@ def Load_rig_previews():
         rig_previews.load(rig.name, rig.preview, 'IMAGE')
 
 # rig预览图的EnumProperty回调函数
+_CMC_RIG_PREVIEWS = []
 def enum_previews_from_rig_previews(self, context):
     """EnumProperty callback"""
     scene = bpy.context.scene
     enum_items = []
+    global _CMC_RIG_PREVIEWS
 
     if context is None:
         return enum_items
@@ -67,7 +69,9 @@ def enum_previews_from_rig_previews(self, context):
             thumb = pcoll[name]
         enum_items.append((name, name, "", thumb.icon_id, i))
 
-    return enum_items
+    _CMC_RIG_PREVIEWS = enum_items
+
+    return _CMC_RIG_PREVIEWS
 
 # 清除所有预览
 def clear_all_previews():

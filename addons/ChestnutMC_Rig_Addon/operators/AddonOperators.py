@@ -8,92 +8,14 @@ import datetime
 
 from ..config import __addon_name__
 from ..panels.ImageManager import *
+from .Defs import *
+
 
 
 #*****************************************************
-#********************* 读取方法 ***********************
-#*****************************************************
-
-def read_skin_json(self):
-    addon_prefs = bpy.context.preferences.addons[__addon_name__].preferences
-
-    # 验证资产库路径
-    try:
-        with open(addon_prefs.skin_preset_json, 'r') as f:
-            library = json.load(f)
-            #print(library)
-            return library
-    except Exception as e:
-        self.report({'ERROR'}, "Fail to load skin json: {}".format(str(e)))
-        return None
-
-def read_rig_json(self):
-        addon_prefs = bpy.context.preferences.addons[__addon_name__].preferences
-
-        # 验证资产库路径
-        try:
-            with open(addon_prefs.rig_preset_json, 'r') as f:
-                library = json.load(f)
-                #print(library)
-                return library
-        except Exception as e:
-            self.report({'ERROR'}, "Fail to load rig json: {}".format(str(e)))
-            return None
-
-def search_skin_preset(json, skin_name):
-    '''搜索皮肤预设，并返回皮肤预设字典'''
-    if json is None:
-        return None
-    for list, skin_preset in json.items():
-        if skin_preset['skin_name'] == skin_name:
-            return skin_preset
-    return None
-
-def check_cmc_rig(selected_object: bpy.types.Object):
-    # 如果当前活动物体是Mesh
-    if selected_object.type == 'MESH':
-        # 验证名称前缀是否为"preview"
-        if selected_object.name.startswith("preview"):
-            return True
-        else:
-            # 获取父级骨骼
-            parent_armature = None
-            if selected_object.parent is not None:
-                parent_armature = selected_object.parent
-                if parent_armature and parent_armature.type == 'ARMATURE':
-                    # 获取父级骨骼中名为"preview"的子物体
-                    for child in parent_armature.children:
-                        if child.type == 'MESH' and child.name.startswith("preview"):
-                            return True
-            else:
-                return False
-    # 如果当前活动物体是Armature
-    elif selected_object.type == 'ARMATURE':
-        # 选择子集中前缀为preview的mesh
-        for child in selected_object.children:
-            if child.type == 'MESH' and child.name.startswith("preview"):
-                return True
-
-    return False
-
-def get_cmc_rig(selected_object: bpy.types.Object):
-    '''检查选中项是否属于栗籽人模，并返回人模骨架'''
-    if check_cmc_rig(selected_object):
-        if selected_object.type == 'ARMATURE':
-            for child in selected_object.children:
-                if child.type == 'MESH' and child.name.startswith("preview"):
-                    return selected_object
-        elif selected_object.type == 'MESH':
-            if selected_object.parent.type == 'ARMATURE':
-                for chile in selected_object.parent.children:
-                    if chile.type == 'MESH' and chile.name.startswith("preview"):
-                        return selected_object.parent
-    return None
-
-
-
 #*****************************************************
 #******************* 资产库操作 ***********************
+#*****************************************************
 #*****************************************************
 # 加载资产库
 class CHESTNUTMC_OT_LoadLibraryOperator(bpy.types.Operator):
@@ -403,7 +325,9 @@ class CHESTNUTMC_OT_Merge_Assets(bpy.types.Operator):
 
 
 #*****************************************************
+#*****************************************************
 #******************** 人模相关操作 ********************
+#*****************************************************
 #*****************************************************
 # 导入人模
 class CHESTNUTMC_OT_RigImportOperator(bpy.types.Operator):
@@ -714,7 +638,7 @@ class CHESTNUTMC_OT_RigDelete(bpy.types.Operator):
     def invoke(self, context, event):
         scene = context.scene
 
-        return context.window_manager.invoke_props_dialog(self, title="Are you sure you want to delete rig: {}?".format(scene.cmc_rig_previews))
+        return context.window_manager.invoke_confirm(self, event, title="Are you sure you want to delete rig: {}?".format(scene.cmc_rig_previews))
 
     def execute(self, context):
         addon_prefers = bpy.context.preferences.addons[__addon_name__].preferences
@@ -803,9 +727,10 @@ class CMC_OT_RigRename(bpy.types.Operator):
 
 
 
-
+#*****************************************************
 #*****************************************************
 #******************** 皮肤相关操作 ********************
+#*****************************************************
 #*****************************************************
 # 添加皮肤
 class CHESTNUTMC_OT_SkinAdd(bpy.types.Operator):
@@ -867,7 +792,7 @@ class CHESTNUTMC_OT_SkinRemove(bpy.types.Operator):
     def invoke(self, context, event):
         scene = context.scene
 
-        return context.window_manager.invoke_props_dialog(self, title="Are you sure you want to remove skin: {}?".format(scene.cmc_skin_list[scene.cmc_skin_list_index].name))
+        return context.window_manager.invoke_confirm(self, event, title="Are you sure you want to remove skin: {}?".format(scene.cmc_skin_list[scene.cmc_skin_list_index].name))
 
     def execute(self, context):
         scene = context.scene
@@ -1447,7 +1372,10 @@ class CHESTNUTMC_OT_DeleteFace2Skin(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context: bpy.types.Context):
-        selected_skin = context.scene.cmc_skin_list[context.scene.cmc_skin_list_index]
+        try:
+            selected_skin = context.scene.cmc_skin_list[context.scene.cmc_skin_list_index]
+        except IndexError:
+            return False
         # 确保当前活动物体是Armature或Mesh
         if context.active_object is not None:
             if check_cmc_rig(context.active_object):
@@ -1493,24 +1421,12 @@ class CHESTNUTMC_OT_DeleteFace2Skin(bpy.types.Operator):
 
 
 
+
+#*****************************************************
 #*****************************************************
 #******************** 骨骼相关操作 ********************
 #*****************************************************
-
-# 复制骨骼变换
-def copy_transform(self, context: bpy.types.Context, bone_name: str, aim_bone_name: str):
-    armature = context.active_object
-    # 复制变换
-    bone = context.active_object.pose.bones[bone_name]
-    aim_bone = context.active_object.pose.bones[aim_bone_name]
-    # 为骨骼添加复制变换约束
-    constraint = bone.constraints.new("COPY_TRANSFORMS")
-    constraint.target = context.active_object
-    constraint.subtarget = aim_bone_name
-    # 应用约束
-    armature.data.bones.active = bone.bone
-    bpy.ops.constraint.apply(constraint=constraint.name, owner='BONE')
-
+#*****************************************************
 
 # ik/fk无缝切换
 class CMC_OT_Switch_IK_FK(bpy.types.Operator):

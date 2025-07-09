@@ -1,5 +1,5 @@
 import bpy
-from ..operators import AddonOperators
+from ..operators import Defs
 
 Rig_Parameters_bones = {
     "meum.body.setting": "General Setting",
@@ -22,7 +22,7 @@ Face_Parameters_nodes = {
 # 骨骼参数绘制方法
 def get_rig_parameters(box, context: bpy.types.Context, bone_name: str):
     # 获取cmcrig
-    armature = AddonOperators.get_cmc_rig(context.active_object)
+    armature = Defs.get_cmc_rig(context.active_object)
 
     # 验证骨骼是否存在
     try:
@@ -83,7 +83,7 @@ def get_rig_parameters(box, context: bpy.types.Context, bone_name: str):
 def get_face_parameters(box, context: bpy.types.Context, material_name: str):
     material = None
 
-    armature = AddonOperators.get_cmc_rig(context.active_object)
+    armature = Defs.get_cmc_rig(context.active_object)
     for child in armature.children:
         if child.type == 'MESH' and child.name.startswith("preview"):
             for material in child.material_slots:
@@ -95,39 +95,42 @@ def get_face_parameters(box, context: bpy.types.Context, material_name: str):
         return None
 
     # 在材质节点树中找到对应节点
-    for node in material.node_tree.nodes:
-        if node.name in Face_Parameters_nodes[material_name]:
-            row = box.row()
-            # 面板展开与收起
-            row.prop(node, "cmc_node_expand",
-                icon="TRIA_DOWN" if node.cmc_node_expand else "TRIA_RIGHT",
-                text="",
-                emboss=True)
-            row.label(text=node.name)
-            if node.cmc_node_expand is False:
-                continue
+    try:
+        for node in material.node_tree.nodes:
+            if node.name in Face_Parameters_nodes[material_name]:
+                row = box.row()
+                # 面板展开与收起
+                row.prop(node, "cmc_node_expand",
+                    icon="TRIA_DOWN" if node.cmc_node_expand else "TRIA_RIGHT",
+                    text="",
+                    emboss=True)
+                row.label(text=node.name)
+                if node.cmc_node_expand is False:
+                    continue
 
-            newbox = box.box()
-            # 如果节点有输入(非图像节点)，则展示未连接节点
-            if len(node.inputs) > 1:
-                for inp in node.inputs:
-                    # 如果节点被连接
-                    if inp.is_linked:
-                        continue
-                    else:
-                        newbox.template_node_view(material.node_tree, node, inp)
-            # 若为图像节点，则展示节点
-            elif node.type == 'TEX_IMAGE':
-                newbox.template_image(node, "image", node.image_user)
-            # 如果节点无输入则进入节点组(Adjuster)
-            else:
-                node_tree = bpy.data.node_groups.get(node.node_tree.name)
-                for out in node_tree.nodes['组输出'].inputs:
-                    # 如果节点有输入
-                    if out.is_linked:
-                        row = newbox.row()
-                        row.alignment = 'RIGHT'
-                        row.label(text=out.name)
-                        row.label(text="Custom Used", icon= "SETTINGS")
-                    else:
-                        newbox.template_node_view(node_tree, node, out)
+                newbox = box.box()
+                # 如果节点有输入(非图像节点)，则展示未连接节点
+                if len(node.inputs) > 1:
+                    for inp in node.inputs:
+                        # 如果节点被连接
+                        if inp.is_linked:
+                            continue
+                        else:
+                            newbox.template_node_view(material.node_tree, node, inp)
+                # 若为图像节点，则展示节点
+                elif node.type == 'TEX_IMAGE':
+                    newbox.template_image(node, "image", node.image_user)
+                # 如果节点无输入则进入节点组(Adjuster)
+                else:
+                    node_tree = bpy.data.node_groups.get(node.node_tree.name)
+                    for out in node_tree.nodes['组输出'].inputs:
+                        # 如果节点有输入
+                        if out.is_linked:
+                            row = newbox.row()
+                            row.alignment = 'RIGHT'
+                            row.label(text=out.name)
+                            row.label(text="Custom Used", icon= "SETTINGS")
+                        else:
+                            newbox.template_node_view(node_tree, node, out)
+    except:
+        pass

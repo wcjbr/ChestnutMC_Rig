@@ -77,8 +77,16 @@ class CMC_ImportPreferences(AddonPreferences):
         default='APPEND',
     ) # type: ignore
 
-    #******************** 预设属性 ********************
-    rig_presets: {} # type: ignore
+
+    #******************** 自动错帧属性 ********************
+    auto_offset_animation_presets_path: StringProperty(
+        name="Auto Offset Animation Presets Path",
+        default=os.path.abspath(os.path.join(
+            os.path.dirname(__file__),
+            "../config/AutoOffsetAnimationPresets"
+        )),
+        subtype='DIR_PATH',
+    ) # type: ignore
 
 
     #******************** 绘制面板 ********************
