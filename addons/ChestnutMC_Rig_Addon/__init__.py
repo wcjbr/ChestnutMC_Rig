@@ -57,7 +57,7 @@ _addon_properties = {
         "cmc_auto_offset_animation_pose_index": bpy.props.IntProperty(name="Auto Offset Animation Index", default=0, options={'LIBRARY_EDITABLE', 'SKIP_SAVE'}, override={'LIBRARY_OVERRIDABLE'}),
         "cmc_auto_offset_animation_settings": CollectionProperty(type=CMC_AutoOffsetAnimationSettings, options={'LIBRARY_EDITABLE'}, override={'LIBRARY_OVERRIDABLE', 'USE_INSERTION'}),
         "cmc_auto_offset_animation_intermediate_action": CollectionProperty(type=CMC_AutoOffsetAnimation_IntermediateAction, options={'LIBRARY_EDITABLE'}, override={'LIBRARY_OVERRIDABLE', 'USE_INSERTION'}),
-        "cmc_auto_offset_animation_intermediate_action_index" : bpy.props.IntProperty(name="Auto Offset Animation Intermediate Action Index", default=0, options={'LIBRARY_EDITABLE', 'SKIP_SAVE'}, override={'LIBRARY_OVERRIDABLE'}),
+        "cmc_auto_offset_animation_intermediate_action_index" : bpy.props.IntProperty(name="Auto Offset Animation Action Index", default=0, options={'LIBRARY_EDITABLE', 'SKIP_SAVE'}, override={'LIBRARY_OVERRIDABLE'}),
     },
 
     #面板属性

@@ -315,14 +315,25 @@ class CHESTNUTMC_OT_SaveIntermediatePose(bpy.types.Operator):
 
         # 新键中间姿态数据
         auto_offset_animation_pose = armature.cmc_auto_offset_animation_intermediate_action.add()
-        auto_offset_animation_pose.action_name = "[Default Name]"
+        auto_offset_animation_pose.action_name = "Action" + str(len(armature.cmc_auto_offset_animation_intermediate_action) - 1)
         auto_offset_animation_pose.pose_frame = context.scene.frame_current
+
+        # 自动记录动作长度
+        armature.cmc_auto_offset_animation_intermediate_action_index = len(armature.cmc_auto_offset_animation_intermediate_action) - 1
+        if armature.cmc_auto_offset_animation_intermediate_action_index > 0:
+            frame_start = armature.cmc_auto_offset_animation_intermediate_action[armature.cmc_auto_offset_animation_intermediate_action_index - 1].pose_frame
+            frame_end = auto_offset_animation_pose.pose_frame
+            if frame_start < frame_end:
+                armature.cmc_auto_offset_animation_intermediate_action[armature.cmc_auto_offset_animation_intermediate_action_index - 1].frame_length = frame_end - frame_start
 
         # 保存中间姿态
         if save_selected_bone_pose_for_autooffset(self, context, 'intermediate', auto_offset_animation_pose):
             self.report({'INFO'}, "Intermediate pose saved successfully!")
             return {'FINISHED'}
-        return {'CANCELLED'}
+        else:
+            auto_offset_animation_pose.remove()
+            self.report({'ERROR'}, "Fail to save intermediate pose.")
+            return {'CANCELLED'}
 
 
 # 更新中间姿态
@@ -506,7 +517,7 @@ class CHESTNUTMC_OT_MovePoseListDown(bpy.types.Operator):
 # 删除姿态
 class CHESTNUTMC_OT_Delete_AO_Pose(bpy.types.Operator):
     bl_idname = "cmc.delete_ao_pose"
-    bl_label = "Delete Saved Pose"
+    bl_label = "Delete Saved Poses"
     bl_description = "Delete saved pose from auto offset animation settings"
     bl_options = {'REGISTER', 'UNDO'}
 
@@ -756,6 +767,112 @@ class CHESTNUTMC_OT_MoveBoneListDown(bpy.types.Operator):
         return{"FINISHED"}
 
 
+# 更改起始姿态模式
+class CHESTNUTMC_OT_ChangeAnticipationPoseMode(bpy.types.Operator):
+    bl_idname = "cmc.change_anticipation_pose_mode"
+    bl_label = "Change Anticipation Pose Mode"
+    bl_description = "Change bones' anticipation pose mode"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    mode: EnumProperty(
+        name="Mode",
+        items=[
+            ("AUTO", "Auto", "Auto generate anticipation pose"),
+            ("CUSTOM", "Custom", "Use custom anticipation pose"),
+            ("NONE", "None", "No anticipation pose"),
+        ],
+        default="AUTO"
+    ) # type: ignore
+
+    apply_range: EnumProperty(
+        name="Apply Range",
+        items=[
+            ("ALL", "All", "Apply to all"),
+            ("SELECTED", "Selected Bones", "Apply to selected bones"),
+        ],
+        default="ALL"
+    ) # type: ignore
+
+    @classmethod
+    def poll(cls, context: bpy.types.Context):
+        if context.active_object is None or context.active_object.type != "ARMATURE":
+            return False
+        if len(context.active_object.cmc_auto_offset_animation_pose) < 1:
+            return False
+        return True
+
+    def invoke(self, context, event):
+        return context.window_manager.invoke_props_dialog(self)
+
+    def execute(self, context):
+        armature = context.active_object
+        if armature.type != 'ARMATURE':
+            self.report({'ERROR'}, "Please select an armature!")
+            return {'CANCELLED'}
+
+        bone_list = []
+        if self.apply_range == "SELECTED":
+            bone_list = [bone.name for bone in armature.pose.bones if bone.bone.select]
+        for pose_bone in armature.cmc_auto_offset_animation_pose:
+            if self.apply_range == "ALL" or pose_bone.bone_name in bone_list:
+                pose_bone.anticipation_pose_mode = self.mode
+
+        return {'FINISHED'}
+
+
+# 更改结束姿态模式
+class CHESTNUTMC_OT_ChangeRecoverPoseMode(bpy.types.Operator):
+    bl_idname = "cmc.change_recover_pose_mode"
+    bl_label = "Change Recover Pose Mode"
+    bl_description = "Change bones' recover pose mode"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    mode: EnumProperty(
+        name="Mode",
+        items=[
+            ("AUTO", "Auto", "Auto generate anticipation pose"),
+            ("CUSTOM", "Custom", "Use custom anticipation pose"),
+            ("NONE", "None", "No anticipation pose"),
+        ],
+        default="AUTO"
+    ) # type: ignore
+
+    apply_range: EnumProperty(
+        name="Apply Range",
+        items=[
+            ("ALL", "All", "Apply to all"),
+            ("SELECTED", "Selected Bones", "Apply to selected bones"),
+        ],
+        default="ALL"
+    ) # type: ignore
+
+    @classmethod
+    def poll(cls, context: bpy.types.Context):
+        if context.active_object is None or context.active_object.type != "ARMATURE":
+            return False
+        if len(context.active_object.cmc_auto_offset_animation_pose) < 1:
+            return False
+        return True
+
+    def invoke(self, context, event):
+        return context.window_manager.invoke_props_dialog(self)
+
+    def execute(self, context):
+        armature = context.active_object
+        if armature.type != 'ARMATURE':
+            self.report({'ERROR'}, "Please select an armature!")
+            return {'CANCELLED'}
+
+        bone_list = []
+        if self.apply_range == "SELECTED":
+            bone_list = [bone.name for bone in armature.pose.bones if bone.bone.select]
+        for pose_bone in armature.cmc_auto_offset_animation_pose:
+            if self.apply_range == "ALL" or pose_bone.bone_name in bone_list:
+                pose_bone.recover_pose_mode = self.mode
+
+        return {'FINISHED'}
+
+
 #*****************************************************
 #*****************************************************
 #******************** 自动错帧 ***********************
@@ -780,7 +897,7 @@ class CHESTNUTMC_OT_CreateAutoOffsetAnimation(bpy.types.Operator):
             bone.keyframe_insert(data_path="rotation_euler", frame=insert_frame, group = bone.name, keytype = frame_type)
         bone.keyframe_insert(data_path="scale", frame=insert_frame, group = bone.name, keytype = frame_type)
 
-    def create_start_end_keyframe(self, armature: bpy.types.Object, bones_list: dict, current_frame: int, aim_frame: int):
+    '''def create_start_end_keyframe(self, armature: bpy.types.Object, bones_list: dict, current_frame: int, aim_frame: int):
         # 骨骼姿态
         # 在当前帧应用起始和结束姿态
         for bone in armature.pose.bones:
@@ -809,13 +926,16 @@ class CHESTNUTMC_OT_CreateAutoOffsetAnimation(bpy.types.Operator):
                         bones_list[bone.name][4] = aim_frame + frame_offset  # 记录结束关键帧位置
                     else:
                         self.insert_selected_bone_keyframe(bone, aim_frame, "KEYFRAME")
-                        bones_list[bone.name][4] = aim_frame  # 记录结束关键帧位置
+                        bones_list[bone.name][4] = aim_frame  # 记录结束关键帧位置'''
 
-    def create_auto_offset_keyframe(self, armature: bpy.types.Object, bones_list: dict, poses, frame: int, s_o_e: str = "None"):
+    def create_auto_offset_keyframe(self, armature: bpy.types.Object, bones_list: dict, action, frame: int, s_o_e: str = "None"):
+        poses = action.action
+        offset_weight = action.offset_weight
+
         for bone in armature.pose.bones:
             if bone.name in bones_list.keys():
                 index = bones_list[bone.name][0]
-                frame_offset = bones_list[bone.name][2] * bones_list[bone.name][1]
+                frame_offset = int(bones_list[bone.name][2] * bones_list[bone.name][1] * offset_weight)
                 # 应用起始姿态
                 for pose in poses:
                     if pose.bone_name == bone.name:
@@ -865,20 +985,20 @@ class CHESTNUTMC_OT_CreateAutoOffsetAnimation(bpy.types.Operator):
 
         # 验证帧长度设置
         if average_frame_length:
+            # 验证评价帧长大于起始和结束姿态帧长
             if frame_length <= (anticipation_pose_offset * use_anticipation_pose):
                 self.report({'ERROR'}, "Frame length must be greater than anticipation pose offsets!")
                 return {'CANCELLED'}
             if frame_length <= (recover_pose_offset * use_recover_pose):
                 self.report({'ERROR'}, "Frame length must be greater than recover pose offsets!")
                 return {'CANCELLED'}
+            if frame_length <= uniform_offset_value * uniform_offset:
+                self.report({'ERROR'}, "Frame length must be greater than uniform offset value!")
+                return {'CANCELLED'}
         else:
-            for action in armature.cmc_auto_offset_animation_intermediate_action:
-                if action.frame_length <= (anticipation_pose_offset * use_anticipation_pose) or action.frame_length < (recover_pose_offset * use_recover_pose):
-                    self.report({'ERROR'}, "Frame length must be greater than anticipation pose offset and recover pose offset!")
-                    return {'CANCELLED'}
-        if frame_length <= uniform_offset_value * uniform_offset:
-            self.report({'ERROR'}, "Frame length must be greater than uniform offset value!")
-            return {'CANCELLED'}
+            if armature.cmc_auto_offset_animation[0].frame_length <= (anticipation_pose_offset * use_anticipation_pose) or armature.cmc_auto_offset_animation[-2].frame_length < (recover_pose_offset * use_recover_pose):
+                self.report({'ERROR'}, "Frame length must be greater than anticipation pose offset and recover pose offset!")
+                return {'CANCELLED'}
 
         # 骨骼列表，并记录优先级、起始和结束关键帧位置
         bones_list = {}
@@ -902,15 +1022,14 @@ class CHESTNUTMC_OT_CreateAutoOffsetAnimation(bpy.types.Operator):
 
         # 遍历姿态列表
         for i, action in enumerate(armature.cmc_auto_offset_animation_intermediate_action):
-            poses = action.action
 
             # 创建动作
             if i == 0:
-                self.create_auto_offset_keyframe(armature, bones_list, poses, current_frame, "start")
+                self.create_auto_offset_keyframe(armature, bones_list, action, current_frame, "start")
             elif action == armature.cmc_auto_offset_animation_intermediate_action[-1]:
-                self.create_auto_offset_keyframe(armature, bones_list, poses, current_frame, "end")
+                self.create_auto_offset_keyframe(armature, bones_list, action, current_frame, "end")
             else:
-                self.create_auto_offset_keyframe(armature, bones_list, poses, current_frame)
+                self.create_auto_offset_keyframe(armature, bones_list, action, current_frame)
 
             # 更新下一关键帧位置
             if average_frame_length:
@@ -928,7 +1047,7 @@ class CHESTNUTMC_OT_CreateAutoOffsetAnimation(bpy.types.Operator):
                             # 应用自定义预备姿态
                             matrix = armature.cmc_auto_offset_animation_pose[index].anticipation_pose
                             bone.matrix_basis = matrix
-                        elif armature.cmc_auto_offset_animation_pose[index].have_start_pose:
+                        else:
                             # 应用预备姿态
                             matrix = armature.cmc_auto_offset_animation_pose[index].start_pose
                             bone.matrix_basis = matrix
@@ -945,7 +1064,7 @@ class CHESTNUTMC_OT_CreateAutoOffsetAnimation(bpy.types.Operator):
                             # 应用自定义收尾姿态
                             matrix = armature.cmc_auto_offset_animation_pose[index].recover_pose
                             bone.matrix_basis = matrix
-                        elif armature.cmc_auto_offset_animation_pose[index].have_end_pose:
+                        else:
                             # 应用收尾姿态
                             matrix = armature.cmc_auto_offset_animation_pose[index].end_pose
                             bone.matrix_basis = matrix

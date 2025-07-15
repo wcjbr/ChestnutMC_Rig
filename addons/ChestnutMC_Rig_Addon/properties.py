@@ -1,7 +1,7 @@
 import os
 
 import bpy
-from bpy.props import StringProperty, IntProperty, BoolProperty, EnumProperty, PointerProperty, CollectionProperty, FloatVectorProperty
+from bpy.props import StringProperty, IntProperty, BoolProperty, EnumProperty, PointerProperty, CollectionProperty, FloatVectorProperty, FloatProperty
 from .panels.UI import *
 
 
@@ -71,11 +71,13 @@ class CMC_AutoOffsetAnimation_IntermediateAction(bpy.types.PropertyGroup):
     action_name: StringProperty(name="Name", options={'LIBRARY_EDITABLE'}, override={'LIBRARY_OVERRIDABLE'}) # type: ignore
     action: CollectionProperty(type=CMC_AutoOffsetAnimation_IntermediateActionItem, options={'LIBRARY_EDITABLE'}, override={'LIBRARY_OVERRIDABLE'}) # type: ignore
     pose_frame: IntProperty(name="Pose Frame", default=0, options={'LIBRARY_EDITABLE'}, override={'LIBRARY_OVERRIDABLE'}) # type: ignore
-    frame_length: IntProperty(name="Frame Length", default=1, min=1, soft_max=20, options={'LIBRARY_EDITABLE'}, override={'LIBRARY_OVERRIDABLE'}) # type: ignore
+    frame_length: IntProperty(name="Action Length", default=1, min=1, soft_max=20, options={'LIBRARY_EDITABLE'}, override={'LIBRARY_OVERRIDABLE'}) # type: ignore
+    offset_weight: FloatProperty(name="Offset Weight", default=1, soft_min=-2, soft_max=2, options={'LIBRARY_EDITABLE'}, override={'LIBRARY_OVERRIDABLE'}) # type: ignore
+    meum_expand: BoolProperty(name="Meum Expand", default=False, options={'LIBRARY_EDITABLE'}, override={'LIBRARY_OVERRIDABLE'}) # type: ignore
 
 # 自动错帧设置
 class CMC_AutoOffsetAnimationSettings(bpy.types.PropertyGroup):
-    frame_length: IntProperty(name="Frame Length", default=20, min=0, soft_max=100, options={'LIBRARY_EDITABLE'}, override={'LIBRARY_OVERRIDABLE'}) # type: ignore
+    frame_length: IntProperty(name="Frame Length", default=10, min=1, soft_max=100, options={'LIBRARY_EDITABLE'}, override={'LIBRARY_OVERRIDABLE'}) # type: ignore
     use_average_frame_length: BoolProperty(name="Use Average Frame Length", default=False, options={'LIBRARY_EDITABLE'}, override={'LIBRARY_OVERRIDABLE'}) # type: ignore
     keyframe_offset: BoolProperty(name="Keyframe Offset", default=False, options={'LIBRARY_EDITABLE'}, override={'LIBRARY_OVERRIDABLE'}) # type: ignore
     uniform_offset: BoolProperty(name="Uniform Offset", default=False, options={'LIBRARY_EDITABLE'}, override={'LIBRARY_OVERRIDABLE'}) # type: ignore

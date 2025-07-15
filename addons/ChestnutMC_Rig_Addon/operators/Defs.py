@@ -196,13 +196,7 @@ def delete_bone_pose_from_autooffset(self, context: bpy.types.Context, mode: str
 
     if len(armature.cmc_auto_offset_animation_pose) > 0:
         for pose in armature.cmc_auto_offset_animation_pose:
-            if mode == 'start':
-                pose.have_start_pose = False
-            elif mode == 'end':
-                pose.have_end_pose = False
-            else:
-                print("Invalid mode")
-                return False
+            setattr(pose, mode, False)
 
     return True
 

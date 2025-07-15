@@ -11,7 +11,7 @@ Rig_Parameters_bones = {
 }
 
 Face_Parameters_nodes = {
-    "Skin": ["Adjuster", "Face Texture", "FaceImageMix"],
+    "Skin": ["Adjuster", "Emotion"],
     "Face": ["ChestnutMC_EyeShader", "SkinSorter"],
     "Mouth": ["ChestnutMC_Mouth"],
     "EdgeLight": ["ChestnutMC_EdgeLight"]

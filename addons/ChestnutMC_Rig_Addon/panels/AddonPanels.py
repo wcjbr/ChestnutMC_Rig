@@ -224,7 +224,8 @@ class ActionManagerPanel(BasePanel, bpy.types.Panel):
                 Object,         # 数据源
                 "cmc_auto_offset_animation_pose",    # 集合属性
                 Object,
-                "cmc_auto_offset_animation_pose_index"   # 活动项索引
+                "cmc_auto_offset_animation_pose_index",   # 活动项索引
+                rows=6
             )
             column = row.column()
             column.operator("cmc.add_bone_to_autooffset_list", text="", icon="ADD")
@@ -260,7 +261,8 @@ class ActionManagerPanel(BasePanel, bpy.types.Panel):
                 Object,
                 "cmc_auto_offset_animation_intermediate_action",
                 Object,
-                "cmc_auto_offset_animation_intermediate_action_index"
+                "cmc_auto_offset_animation_intermediate_action_index",
+                rows=8
             )
             column = row.column()
             column.operator("cmc.save_intermediate_pose", text="Save Pose", icon="FILE_TICK")
@@ -271,7 +273,7 @@ class ActionManagerPanel(BasePanel, bpy.types.Panel):
             column.operator("cmc.move_pose_list_down", text="Move Down", icon="TRIA_DOWN")
             column.separator()
             column.operator("cmc.apply_intermediate_pose", text="Apply Pose", icon='POSE_HLT')
-            box.operator(CHESTNUTMC_OT_Delete_AO_Pose.bl_idname, text="Delete Saved Pose", icon='TRASH')
+            column.operator(CHESTNUTMC_OT_Delete_AO_Pose.bl_idname, text="Delete Saved Poses", icon='TRASH')
 
             # 设置部分
             setting = getattr(Object, "cmc_auto_offset_animation_settings", [])
@@ -280,7 +282,7 @@ class ActionManagerPanel(BasePanel, bpy.types.Panel):
                 # 基本设置
                 nbox = box.box()
                 row = nbox.row()
-                row.prop(setting[0], "use_average_frame_length", text="Average Frame Length")
+                row.prop(setting[0], "use_average_frame_length", text="Average Action Length")
                 column = row.column()
                 column.prop(setting[0], "frame_length", text="")
                 column.enabled = True if setting[0].use_average_frame_length else False
@@ -337,50 +339,10 @@ class ActionManagerPanel(BasePanel, bpy.types.Panel):
 
                 # 错帧动画创建
                 box.separator()
-                box.operator("cmc.create_auto_offset_animation", text="Create Auto Offset Animation", icon='TRIA_RIGHT')
+                row = box.row()
+                row.operator("cmc.create_auto_offset_animation", text="Create Auto Offset Animation", icon='TRIA_RIGHT', depress=bpy.ops.cmc.create_auto_offset_animation.poll())
 
 
-        #* 选择集面板
-        layout = self.layout
-        layout.separator()
-
-        arm = context.object
-        layout.label(text="Selection Sets", icon='GROUP_BONE')
-
-        row = layout.row()
-        row.enabled = (context.mode == 'POSE')
-
-        # UI list
-        rows = 4 if len(arm.selection_sets) > 0 else 1
-        row.template_list(
-            "POSE_UL_selection_set", "",  # type and unique id
-            arm, "selection_sets",  # pointer to the CollectionProperty
-            arm, "active_selection_set",  # pointer to the active identifier
-            rows=rows
-        )
-
-        # add/remove/specials UI list Menu
-        col = row.column(align=True)
-        col.operator("pose.selection_set_add", icon='ADD', text="")
-        col.operator("pose.selection_set_remove", icon='REMOVE', text="")
-        col.menu("POSE_MT_selection_sets_context_menu", icon='DOWNARROW_HLT', text="")
-
-        # move up/down arrows
-        if len(arm.selection_sets) > 0:
-            col.separator()
-            col.operator("pose.selection_set_move", icon='TRIA_UP', text="").direction = 'UP'
-            col.operator("pose.selection_set_move", icon='TRIA_DOWN', text="").direction = 'DOWN'
-
-        # buttons
-        row = layout.row()
-
-        sub = row.row(align=True)
-        sub.operator("pose.selection_set_assign", text="Assign")
-        sub.operator("pose.selection_set_unassign", text="Remove")
-
-        sub = row.row(align=True)
-        sub.operator("pose.selection_set_select", text="Select")
-        sub.operator("pose.selection_set_deselect", text="Deselect")
 
         #* 变换面板
         layout = self.layout
@@ -447,6 +409,49 @@ class ActionManagerPanel(BasePanel, bpy.types.Panel):
             col.prop(bone, "roll")
             col.prop(bone, "length")
             col.prop(bone, "lock")
+
+
+        #* 选择集面板
+        layout = self.layout
+        layout.separator()
+
+        arm = context.object
+        layout.label(text="Selection Sets", icon='GROUP_BONE')
+
+        row = layout.row()
+        row.enabled = (context.mode == 'POSE')
+
+        # UI list
+        rows = 4 if len(arm.selection_sets) > 0 else 1
+        row.template_list(
+            "POSE_UL_selection_set", "",  # type and unique id
+            arm, "selection_sets",  # pointer to the CollectionProperty
+            arm, "active_selection_set",  # pointer to the active identifier
+            rows=rows
+        )
+
+        # add/remove/specials UI list Menu
+        col = row.column(align=True)
+        col.operator("pose.selection_set_add", icon='ADD', text="")
+        col.operator("pose.selection_set_remove", icon='REMOVE', text="")
+        col.menu("POSE_MT_selection_sets_context_menu", icon='DOWNARROW_HLT', text="")
+
+        # move up/down arrows
+        if len(arm.selection_sets) > 0:
+            col.separator()
+            col.operator("pose.selection_set_move", icon='TRIA_UP', text="").direction = 'UP'
+            col.operator("pose.selection_set_move", icon='TRIA_DOWN', text="").direction = 'DOWN'
+
+        # buttons
+        row = layout.row()
+
+        sub = row.row(align=True)
+        sub.operator("pose.selection_set_assign", text="Assign")
+        sub.operator("pose.selection_set_unassign", text="Remove")
+
+        sub = row.row(align=True)
+        sub.operator("pose.selection_set_select", text="Select")
+        sub.operator("pose.selection_set_deselect", text="Deselect")
 
     @classmethod
     def poll(cls, context: bpy.types.Context):
