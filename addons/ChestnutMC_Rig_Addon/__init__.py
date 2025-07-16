@@ -17,7 +17,7 @@ bl_info = {
     "name": "ChestnutMC Rig Addon",
     "author": "Chestnut_i",
     "blender": (4, 2, 0),
-    "version": (0, 0, 2),
+    "version": (0, 0, 3),
     "description": "This is a MC rig addon for Blender. Aims to provide a useful rig and user-friendly interface of rigging.",
     "warning": "This is a test version. Do not use it in current production!",
     "doc_url": "[documentation url]",

@@ -5,6 +5,7 @@ import json
 import struct
 import shutil
 import datetime
+from bpy.app.translations import pgettext_iface as _
 
 from ..config import __addon_name__
 from ..panels.ImageManager import *
@@ -638,7 +639,8 @@ class CHESTNUTMC_OT_RigDelete(bpy.types.Operator):
     def invoke(self, context, event):
         scene = context.scene
 
-        return context.window_manager.invoke_confirm(self, event, title="Are you sure you want to delete rig: {}?".format(scene.cmc_rig_previews))
+        title = _("Are you sure you want to delete rig: {name}?").format(name=scene.cmc_rig_previews)
+        return context.window_manager.invoke_confirm(self, event, title=title)
 
     def execute(self, context):
         addon_prefers = bpy.context.preferences.addons[__addon_name__].preferences
@@ -792,7 +794,8 @@ class CHESTNUTMC_OT_SkinRemove(bpy.types.Operator):
     def invoke(self, context, event):
         scene = context.scene
 
-        return context.window_manager.invoke_confirm(self, event, title="Are you sure you want to remove skin: {}?".format(scene.cmc_skin_list[scene.cmc_skin_list_index].name))
+        title = _("Are you sure you want to remove skin: {name}?").format(name = scene.cmc_skin_list[scene.cmc_skin_list_index].name)
+        return context.window_manager.invoke_confirm(self, event, title=title)
 
     def execute(self, context):
         scene = context.scene
@@ -831,7 +834,7 @@ class CHESTNUTMC_OT_SkinRename(bpy.types.Operator):
     bl_description = "Rename skin"
     bl_options = {'REGISTER', 'UNDO'}
 
-    new_name: bpy.props.StringProperty(name="New Name") # type: ignore
+    new_name: bpy.props.StringProperty(name="New name") # type: ignore
 
     def invoke(self, context, event):
 

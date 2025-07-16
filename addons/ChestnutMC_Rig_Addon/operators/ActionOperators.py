@@ -305,6 +305,8 @@ class CHESTNUTMC_OT_SaveIntermediatePose(bpy.types.Operator):
     def poll(cls, context: bpy.types.Context):
         if context.mode != 'POSE':
             return False
+        if len(context.active_object.cmc_auto_offset_animation_pose) == 0:
+            return False
         return True
 
     def execute(self, context: bpy.types.Context):
@@ -331,7 +333,6 @@ class CHESTNUTMC_OT_SaveIntermediatePose(bpy.types.Operator):
             self.report({'INFO'}, "Intermediate pose saved successfully!")
             return {'FINISHED'}
         else:
-            auto_offset_animation_pose.remove()
             self.report({'ERROR'}, "Fail to save intermediate pose.")
             return {'CANCELLED'}
 
@@ -557,7 +558,7 @@ class CHESTNUTMC_OT_Delete_AO_Pose(bpy.types.Operator):
                 while len(armature.cmc_auto_offset_animation_intermediate_action) > 0:
                     bpy.ops.cmc.delete_intermediate_pose()
 
-        self.report({"INFO"}, "All poses deleted!")
+        self.report({"INFO"}, "Poses deleted!")
         return{"FINISHED"}
 
 
@@ -631,7 +632,8 @@ class CHESTNUTMC_OT_Delete_Bone_From_AutoOffset_List(bpy.types.Operator):
             return {"CANCELLED"}
         # 从列表删除骨骼
         armature.cmc_auto_offset_animation_pose.remove(index)
-        armature.cmc_auto_offset_animation_pose_index -= 1
+        if armature.cmc_auto_offset_animation_pose_index > 0:
+            armature.cmc_auto_offset_animation_pose_index -= 1
         return {"FINISHED"}
 
 
@@ -996,7 +998,7 @@ class CHESTNUTMC_OT_CreateAutoOffsetAnimation(bpy.types.Operator):
                 self.report({'ERROR'}, "Frame length must be greater than uniform offset value!")
                 return {'CANCELLED'}
         else:
-            if armature.cmc_auto_offset_animation[0].frame_length <= (anticipation_pose_offset * use_anticipation_pose) or armature.cmc_auto_offset_animation[-2].frame_length < (recover_pose_offset * use_recover_pose):
+            if armature.cmc_auto_offset_animation_intermediate_action[0].frame_length <= (anticipation_pose_offset * use_anticipation_pose) or armature.cmc_auto_offset_animation_intermediate_action[-2].frame_length < (recover_pose_offset * use_recover_pose):
                 self.report({'ERROR'}, "Frame length must be greater than anticipation pose offset and recover pose offset!")
                 return {'CANCELLED'}
 
