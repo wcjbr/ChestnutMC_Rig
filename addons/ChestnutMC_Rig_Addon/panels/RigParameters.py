@@ -11,7 +11,7 @@ Rig_Parameters_bones = {
 }
 
 Face_Parameters_nodes = {
-    "Skin": ["Adjuster", "Emotion"],
+    "Skin": ["Adjuster", "Emotion", "ChestnutMC_PBR_Shader"],
     "Face": ["ChestnutMC_EyeShader", "SkinSorter"],
     "Mouth": ["ChestnutMC_Mouth"],
     "EdgeLight": ["ChestnutMC_EdgeLight"]
@@ -79,7 +79,7 @@ def get_rig_parameters(box, context: bpy.types.Context, bone_name: str):
             row.operator("cmc.switch_r_leg_fkik", text="Seamless IK->FK", icon="MODIFIER")
 
 
-# 面部参数绘制方法
+# 材质参数绘制方法
 def get_face_parameters(box, context: bpy.types.Context, material_name: str):
     material = None
 
@@ -97,7 +97,11 @@ def get_face_parameters(box, context: bpy.types.Context, material_name: str):
     # 在材质节点树中找到对应节点
     try:
         for node in material.node_tree.nodes:
-            if node.name in Face_Parameters_nodes[material_name]:
+            if node.name in Face_Parameters_nodes[material_name] or node.label in Face_Parameters_nodes[material_name]:
+                if (node.name.startswith("Adjuster") or node.name.startswith("ChestnutMC_EdgeLight")) and bpy.context.scene.render.engine != 'BLENDER_EEVEE_NEXT':
+                    continue
+                if node.name.startswith("ChestnutMC_PBR_Shader") and bpy.context.scene.render.engine != 'CYCLES':
+                    continue
                 row = box.row()
                 # 面板展开与收起
                 row.prop(node, "cmc_node_expand",
@@ -109,8 +113,19 @@ def get_face_parameters(box, context: bpy.types.Context, material_name: str):
                     continue
 
                 newbox = box.box()
+                # 如果为PBR节点
+                if node.name == "ChestnutMC_PBR_Shader" or node.label == "ChestnutMC_PBR_Shader":
+                    node_tree = bpy.data.node_groups.get(node.node_tree.name)
+                    for node in node_tree.nodes:
+                        if node.name == "ChestnutMC_PBR_Shader" or node.label == "ChestnutMC_PBR_Shader":
+                            for inp in node.inputs:
+                                # 如果节点被连接
+                                if inp.is_linked:
+                                    continue
+                                else:
+                                    newbox.template_node_view(node_tree, node, inp)
                 # 如果节点有输入(非图像节点)，则展示未连接节点
-                if len(node.inputs) > 1:
+                elif len(node.inputs) > 1:
                     for inp in node.inputs:
                         # 如果节点被连接
                         if inp.is_linked:
