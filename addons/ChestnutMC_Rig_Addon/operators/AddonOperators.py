@@ -111,7 +111,10 @@ class CHESTNUTMC_OT_Export_Asset_Library(bpy.types.Operator):
 
     def execute(self, context):
 
-        ex_path = os.path.join(self.filepath, "ChestnutMC_AssetLibrary")
+        # 获取系统时间
+        time = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+
+        ex_path = os.path.join(self.filepath, "ChestnutMC_AssetLibrary_" + str(time))
         assets_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../assets"))
         config_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../config"))
 
@@ -123,6 +126,11 @@ class CHESTNUTMC_OT_Export_Asset_Library(bpy.types.Operator):
         except Exception as e:
             self.report({"ERROR"}, f"Export Failed: {e}")
             return {"CANCELLED"}
+
+        # 压缩文件夹
+        shutil.make_archive(ex_path, "zip", ex_path)
+        # 删除原文件夹
+        shutil.rmtree(ex_path)
 
         self.report({"INFO"}, f"Export Success to {ex_path}")
         return {"FINISHED"}
@@ -145,7 +153,7 @@ class CHESTNUTMC_OT_Merge_Assets(bpy.types.Operator):
         default="RENAME"
     ) # type: ignore
 
-    filepath: bpy.props.StringProperty(subtype="DIR_PATH") # type: ignore
+    filepath: bpy.props.StringProperty(subtype="FILE_PATH") # type: ignore
 
     def copy_tree_with_existing(self, src, dst):
         """复制目录树，跳过或重命名已存在的文件"""
@@ -283,8 +291,13 @@ class CHESTNUTMC_OT_Merge_Assets(bpy.types.Operator):
     def execute(self, context: bpy.types.Context):
         addon_perefers = context.preferences.addons[__addon_name__].preferences
 
-        selected_assets_path = os.path.abspath(os.path.join(self.filepath, "assets"))
-        selected_config_path = os.path.abspath(os.path.join(self.filepath, "config"))
+        dir_path = os.path.splitext(self.filepath)[0]
+
+        # 解压压缩包
+        shutil.unpack_archive(self.filepath, dir_path)
+
+        selected_assets_path = os.path.abspath(os.path.join(dir_path, "assets"))
+        selected_config_path = os.path.abspath(os.path.join(dir_path, "config"))
 
         dest_assets_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../assets"))
         dest_config_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../config"))
@@ -318,9 +331,13 @@ class CHESTNUTMC_OT_Merge_Assets(bpy.types.Operator):
         self.merge_rig_json(os.path.join(selected_config_path, "RigPresets.json"), addon_perefers.rig_preset_json)
         self.merge_skin_json(os.path.join(selected_config_path, "SkinPresets.json"), addon_perefers.skin_preset_json)
 
+        # 删除解压文件
+        shutil.rmtree(dir_path)
+
         # 重新加载资产库
         bpy.ops.cmc.load_library()
 
+        self.report({"INFO"}, "Asset library updated!")
         return {"FINISHED"}
 
 

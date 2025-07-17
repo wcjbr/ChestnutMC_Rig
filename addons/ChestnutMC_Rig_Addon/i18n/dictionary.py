@@ -107,6 +107,7 @@ dictionary = {
         ("*", "New name"): "新名称",
         ("*", "Are you sure you want to remove skin: {name}?"): "确定要删除皮肤：{name}？",
         # 提示信息
+        ("*", "Asset library updated!"): "资产库已更新！",
         ("*", "Start pose saved successfully!"): "起始姿态保存成功！",
         ("*", "End pose saved successfully!"): "结束姿态保存成功！",
         ("*", "Anticipation pose saved successfully!"): "预备姿态保存成功！",
