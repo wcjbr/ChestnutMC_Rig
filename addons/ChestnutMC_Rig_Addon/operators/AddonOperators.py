@@ -538,7 +538,7 @@ class CHESTNUTMC_OT_RigSave(bpy.types.Operator):
         # 要导出的集合名称
         source_coll = bpy.data.collections.get(select_collection)
         if not source_coll:
-            print(f"Connot find collection: {select_collection}")
+            self.report(f"Connot find collection: {select_collection}")
             raise SystemExit
 
         # 创建导出用场景
@@ -551,6 +551,9 @@ class CHESTNUTMC_OT_RigSave(bpy.types.Operator):
         new_coll.name = self.rigname + "_Rig"
         new_coll.name = new_coll.name.replace(".", "_")
         export_scene.collection.children.link(new_coll)
+
+        # 打包外部数据
+        bpy.ops.file.pack_all()
 
         # 准备写入的数据
         data_blocks = {export_scene}
