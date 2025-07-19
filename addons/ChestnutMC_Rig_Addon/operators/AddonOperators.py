@@ -449,6 +449,13 @@ class CHESTNUTMC_OT_RigImportOperator(bpy.types.Operator):
             self.report({'ERROR'}, "Invalid mode selected")
             return {'CANCELLED'}
 
+        # 选中人模
+        for obj in coll.objects:
+            if check_cmc_rig(obj):
+                armature = get_cmc_rig(obj)
+                break
+        # 将骨架移动到游标位置
+        armature.location = bpy.context.scene.cursor.location
 
         return {'FINISHED'}
 
