@@ -712,7 +712,7 @@ class CMC_OT_RigRename(bpy.types.Operator):
     bl_description = "Rename the rig"
     bl_options = {'REGISTER', 'UNDO'}
 
-    new_name: StringProperty(name="New Name") # type: ignore
+    new_name: StringProperty(name="New name") # type: ignore
 
     @classmethod
     def poll(cls, context):
@@ -1415,7 +1415,8 @@ class CHESTNUTMC_OT_DeleteFace2Skin(bpy.types.Operator):
 
     def invoke(self, context: bpy.types.Context, event):
         selected_skin = context.scene.cmc_skin_list[context.scene.cmc_skin_list_index]
-        context.window_manager.invoke_props_dialog(self, title=f"Are you sure to delete the skin preset: {selected_skin.name}?")
+        title = _("Are you sure to delete the skin preset: {name}?").format(name=selected_skin.name)
+        context.window_manager.invoke_props_dialog(self, title=title)
         return {'RUNNING_MODAL'}
 
     def execute(self, context):

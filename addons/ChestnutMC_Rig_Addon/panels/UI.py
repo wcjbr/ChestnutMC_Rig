@@ -131,7 +131,7 @@ class CMC_UL_AutoOffset_IntermediateActionList(bpy.types.UIList):
             column.scale_x = 1.2
             column.prop(action, "action_name", text=f"Action: {index}", emboss=False)
             column = row.column(align=True)
-            column.active = length_active
+            column.active = length_active if index != len(context.object.cmc_auto_offset_animation_intermediate_action) - 1 else False
             column.prop(action, "frame_length", text="Action Length")
             # 高级面板
             if action.meum_expand:

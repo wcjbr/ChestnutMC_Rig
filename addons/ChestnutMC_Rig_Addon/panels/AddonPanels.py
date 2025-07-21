@@ -166,21 +166,6 @@ class RigPropertiesPanel(BasePanel, bpy.types.Panel):
             return False
         return True
 
-# 组件面板
-@reg_order(3)
-class AddonManagerPanel(BasePanel, bpy.types.Panel):
-    bl_label = "ChestnutMC Addon Manager Panel"
-    bl_idname = "CHESTNUTMC_PT_AddonManagerPanel"
-
-    def draw(self, context: bpy.types.Context):
-        layout = self.layout
-
-    @classmethod
-    def poll(cls, context: bpy.types.Context):
-        if context.mode != "OBJECT":
-            return False
-        return True
-
 
 # 动作管理面板
 @reg_order(4)
