@@ -1406,12 +1406,7 @@ class CHESTNUTMC_OT_DeleteFace2Skin(bpy.types.Operator):
             selected_skin = context.scene.cmc_skin_list[context.scene.cmc_skin_list_index]
         except IndexError:
             return False
-        # 确保当前活动物体是Armature或Mesh
-        if context.active_object is not None:
-            if check_cmc_rig(context.active_object):
-                if selected_skin.have_preset:
-                    return True
-        return False
+        return True
 
     def invoke(self, context: bpy.types.Context, event):
         selected_skin = context.scene.cmc_skin_list[context.scene.cmc_skin_list_index]
