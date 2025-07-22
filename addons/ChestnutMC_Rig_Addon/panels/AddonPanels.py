@@ -306,7 +306,7 @@ class ActionManagerPanel(BasePanel, bpy.types.Panel):
                 # 收尾式设置
                 nbox = box.box()
                 row = nbox.row()
-                row.prop(setting[0], "use_recover_pose", text="Recover Pose")
+                row.prop(setting[0], "use_recover_pose", text="Postponement Pose")
                 column = row.column()
                 column.active = True if setting[0].use_recover_pose else False
                 nrow = column.row()
@@ -320,10 +320,10 @@ class ActionManagerPanel(BasePanel, bpy.types.Panel):
                             emboss=True)
                 if context.active_object.cmc_auto_offset_animation_settings[0].recover_advance_expand:
                     column.operator("cmc.save_recover_pose",
-                                    text="Save Custom Recover Pose",
+                                    text="Save Custom Postponement Pose",
                                     icon='FILE_TICK',
                                 depress=True if len(context.active_object.cmc_auto_offset_animation_pose) > 0 and context.active_object.cmc_auto_offset_animation_pose[-1].have_recover_pose else False)
-                    column.operator("cmc.apply_recover_pose", text="Apply Custom Recover Pose", icon='POSE_HLT')
+                    column.operator("cmc.apply_recover_pose", text="Apply Custom Postponement Pose", icon='POSE_HLT')
 
                 # 错帧动画创建
                 box.separator()

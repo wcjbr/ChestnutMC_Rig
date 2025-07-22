@@ -86,8 +86,8 @@ class CHESTNUTMC_OT_SaveAnticipationPose(bpy.types.Operator):
 class CHESTNUTMC_OT_SaveRecoverPose(bpy.types.Operator):
     '''Auto Offset Animation'''
     bl_idname = "cmc.save_recover_pose"
-    bl_label = "Save Recover Pose"
-    bl_description = "Save Recover Pose if you want to use it"
+    bl_label = "Save Postponement Pose"
+    bl_description = "Save Postponement Pose if you want to use it"
     bl_options = {'REGISTER', 'UNDO'}
 
     @classmethod
@@ -100,7 +100,7 @@ class CHESTNUTMC_OT_SaveRecoverPose(bpy.types.Operator):
 
     def execute(self, context: bpy.types.Context):
         if save_selected_bone_pose_for_autooffset(self, context, 'recover'):
-            self.report({'INFO'}, "Recover pose saved successfully!")
+            self.report({'INFO'}, "Postponement pose saved successfully!")
             return {'FINISHED'}
         return {'CANCELLED'}
 
@@ -246,10 +246,10 @@ class CHESTNUTMC_OT_ApplyAnticipationPose(bpy.types.Operator):
 
 # 应用recover姿态
 class CHESTNUTMC_OT_ApplyRecoverPose(bpy.types.Operator):
-    """Apply Recover Pose."""
+    """Apply Postponement Pose."""
     bl_idname = "cmc.apply_recover_pose"
-    bl_label = "Apply Custom Recover Pose"
-    bl_description = "Apply custom recover pose if had been saved"
+    bl_label = "Apply Custom Postponement Pose"
+    bl_description = "Apply custom postponement pose if had been saved"
     bl_options = {'REGISTER', 'UNDO'}
 
     mode: bpy.props.EnumProperty(
@@ -287,9 +287,9 @@ class CHESTNUTMC_OT_ApplyRecoverPose(bpy.types.Operator):
                     matrix = pose.recover_pose
                     bone.matrix_basis = matrix
             else:
-                self.report({'WARNING'}, f"Bone {pose.bone_name} does not have a recover pose saved.")
+                self.report({'WARNING'}, f"Bone {pose.bone_name} does not have a postponement pose saved.")
 
-        self.report({'INFO'}, "Recover pose applied successfully!")
+        self.report({'INFO'}, "Postponement pose applied successfully!")
         return {'FINISHED'}
 
 
@@ -525,7 +525,7 @@ class CHESTNUTMC_OT_Delete_AO_Pose(bpy.types.Operator):
     #delete_start_pose: bpy.props.BoolProperty(name="Delete Start Pose", default=True) # type: ignore
     #delete_end_pose: bpy.props.BoolProperty(name="Delete End Pose", default=True) # type: ignore
     delete_anticipation_pose: bpy.props.BoolProperty(name="Delete Anticipation Pose", default=True) # type: ignore
-    delete_recover_pose: bpy.props.BoolProperty(name="Delete Recover Pose", default=True) # type: ignore
+    delete_recover_pose: bpy.props.BoolProperty(name="Delete Postponement Pose", default=True) # type: ignore
     delete_all_action: bpy.props.BoolProperty(name="Delete All Action", default=True) # type: ignore
 
     @classmethod
@@ -825,8 +825,8 @@ class CHESTNUTMC_OT_ChangeAnticipationPoseMode(bpy.types.Operator):
 # 更改结束姿态模式
 class CHESTNUTMC_OT_ChangeRecoverPoseMode(bpy.types.Operator):
     bl_idname = "cmc.change_recover_pose_mode"
-    bl_label = "Change Recover Pose Mode"
-    bl_description = "Change bones' recover pose mode"
+    bl_label = "Change Postponement Pose Mode"
+    bl_description = "Change bones' postponement pose mode"
     bl_options = {'REGISTER', 'UNDO'}
 
     mode: EnumProperty(
@@ -992,14 +992,14 @@ class CHESTNUTMC_OT_CreateAutoOffsetAnimation(bpy.types.Operator):
                 self.report({'ERROR'}, "Frame length must be greater than anticipation pose offsets!")
                 return {'CANCELLED'}
             if frame_length <= (recover_pose_offset * use_recover_pose):
-                self.report({'ERROR'}, "Frame length must be greater than recover pose offsets!")
+                self.report({'ERROR'}, "Frame length must be greater than postponement pose offsets!")
                 return {'CANCELLED'}
             if frame_length <= uniform_offset_value * uniform_offset:
                 self.report({'ERROR'}, "Frame length must be greater than uniform offset value!")
                 return {'CANCELLED'}
         else:
             if armature.cmc_auto_offset_animation_intermediate_action[0].frame_length <= (anticipation_pose_offset * use_anticipation_pose) or armature.cmc_auto_offset_animation_intermediate_action[-2].frame_length < (recover_pose_offset * use_recover_pose):
-                self.report({'ERROR'}, "Frame length must be greater than anticipation pose offset and recover pose offset!")
+                self.report({'ERROR'}, "Frame length must be greater than anticipation pose offset and postponement pose offset!")
                 return {'CANCELLED'}
 
         # 骨骼列表，并记录优先级、起始和结束关键帧位置

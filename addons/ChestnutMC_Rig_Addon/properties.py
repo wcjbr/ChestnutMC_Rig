@@ -55,7 +55,7 @@ class CMC_AutoOffsetAnimationItem(bpy.types.PropertyGroup):
     have_anticipation_pose: BoolProperty(name="Have Anticipation Pose", default=False, options={'LIBRARY_EDITABLE'}, override={'LIBRARY_OVERRIDABLE'}) # type: ignore
     recover_pose: FloatVectorProperty(name="Recover Matrix", subtype="MATRIX", size=16, options={'LIBRARY_EDITABLE'}, override={'LIBRARY_OVERRIDABLE'}) # type: ignore
     recover_pose_mode: EnumProperty(
-        name="Recover Pose Mode",
+        name="Postponement Pose Mode",
         items=[
             ("AUTO", "Auto", "Auto generate recover pose"),
             ("CUSTOM", "Custom", "Use custom recover pose"),
@@ -64,7 +64,7 @@ class CMC_AutoOffsetAnimationItem(bpy.types.PropertyGroup):
         default="AUTO",
         options={'LIBRARY_EDITABLE'}, override={'LIBRARY_OVERRIDABLE'}
         )   # type: ignore
-    have_recover_pose: BoolProperty(name="Have Recover Pose", default=False, options={'LIBRARY_EDITABLE'}, override={'LIBRARY_OVERRIDABLE'}) # type: ignore
+    have_recover_pose: BoolProperty(name="Have Postponement Pose", default=False, options={'LIBRARY_EDITABLE'}, override={'LIBRARY_OVERRIDABLE'}) # type: ignore
 
 # 中间姿态
 class CMC_AutoOffsetAnimation_IntermediateAction(bpy.types.PropertyGroup):
@@ -85,9 +85,9 @@ class CMC_AutoOffsetAnimationSettings(bpy.types.PropertyGroup):
     use_anticipation_pose: BoolProperty(name="Anticipation Pose", default=False, options={'LIBRARY_EDITABLE'}, override={'LIBRARY_OVERRIDABLE'}) # type: ignore
     anticipation_pose_offset: IntProperty(name="Anticipation Pose Offset", default=4, soft_min=-10, soft_max=10, options={'LIBRARY_EDITABLE'}, override={'LIBRARY_OVERRIDABLE'}) # type: ignore
     anticipation_pose_intensity: IntProperty(name="Anticipation Pose Intension", default=50, min=-100, max=100, options={'LIBRARY_EDITABLE'}, override={'LIBRARY_OVERRIDABLE'}) # type: ignore
-    use_recover_pose: BoolProperty(name="Recover Pose", default=False, options={'LIBRARY_EDITABLE'}, override={'LIBRARY_OVERRIDABLE'}) # type: ignore
-    recover_pose_offset: IntProperty(name="Recover Pose Offset", default=4, soft_min=-10, soft_max=10, options={'LIBRARY_EDITABLE'}, override={'LIBRARY_OVERRIDABLE'}) # type: ignore
-    recover_pose_intensity: IntProperty(name="Recover Pose Intension", default=50, min=-100, max=100, options={'LIBRARY_EDITABLE'}, override={'LIBRARY_OVERRIDABLE'}) # type: ignore
+    use_recover_pose: BoolProperty(name="Postponement Pose", default=False, options={'LIBRARY_EDITABLE'}, override={'LIBRARY_OVERRIDABLE'}) # type: ignore
+    recover_pose_offset: IntProperty(name="Postponement Pose Offset", default=4, soft_min=-10, soft_max=10, options={'LIBRARY_EDITABLE'}, override={'LIBRARY_OVERRIDABLE'}) # type: ignore
+    recover_pose_intensity: IntProperty(name="Postponement Pose Intension", default=50, min=-100, max=100, options={'LIBRARY_EDITABLE'}, override={'LIBRARY_OVERRIDABLE'}) # type: ignore
     anticipation_advance_expand: BoolProperty(name="Anticipation Advance", default=False, options={'LIBRARY_EDITABLE'}, override={'LIBRARY_OVERRIDABLE'}) # type: ignore
     recover_advance_expand: BoolProperty(name="Recover Advance", default=False, options={'LIBRARY_EDITABLE'}, override={'LIBRARY_OVERRIDABLE'}) # type: ignore
 
