@@ -113,6 +113,45 @@ def copy_transform(self, context: bpy.types.Context, bone_name: str, aim_bone_na
     armature.data.bones.active = bone.bone
     bpy.ops.constraint.apply(constraint=constraint.name, owner='BONE')
 
+# 插入无缝IKFK关键帧
+def insert_seamless_ikfk_keyframe(self, context: bpy.types.Context, bone_list, properity_bone_name: str, frame: int):
+    armature = context.active_object
+    if check_cmc_rig(armature) is False:
+        self.report({'ERROR'}, "Not a ChestnutMC Rig")
+        return False
+
+    try:
+        properity_bone = armature.pose.bones[properity_bone_name]
+    except:
+        self.report({'ERROR'}, "Bone not found: {}".format(properity_bone_name))
+        return False
+
+    for bone_name in bone_list:
+        try:
+            bone = armature.pose.bones[bone_name]
+        except:
+            self.report({'ERROR'}, "Bone not found: {}".format(bone_name))
+            continue
+        # 插入关键帧
+        bone.keyframe_insert(data_path="location", frame=frame, group = bone.name)
+        # 检查骨骼旋转模式
+        if bone.rotation_mode == 'QUATERNION':
+            bone.keyframe_insert(data_path="rotation_quaternion", frame=frame, group = bone.name)
+        elif bone.rotation_mode == 'AXIS_ANGLE':
+            bone.keyframe_insert(data_path="rotation_axis_angle", frame=frame, group = bone.name)
+        else:
+            bone.keyframe_insert(data_path="rotation_euler", frame=frame, group = bone.name)
+        bone.keyframe_insert(data_path="scale", frame=frame, group = bone.name)
+
+    for prop in properity_bone.keys():
+        if prop.startswith("FK/IK") or prop.startswith("IK极向独立控制"):
+            # 注意：这里使用 properity_bone，而且 data_path 要加 ['prop']
+            path = f'["{prop}"]'
+            properity_bone.keyframe_insert(data_path=path, frame=frame, group=properity_bone.name)
+
+    return True
+
+
 
 
 #*************************************************

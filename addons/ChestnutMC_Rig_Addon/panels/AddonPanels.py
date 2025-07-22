@@ -88,7 +88,8 @@ class SkinSwapperPanel(BasePanel, bpy.types.Panel):
             scene,         # 数据源
             "cmc_skin_list",    # 集合属性
             scene,
-            "cmc_skin_list_index"   # 活动项索引
+            "cmc_skin_list_index",   # 活动项索引
+            rows=8,
         )
 
         column = row.column(align=True,)
@@ -97,6 +98,8 @@ class SkinSwapperPanel(BasePanel, bpy.types.Panel):
         column.operator(CHESTNUTMC_OT_SkinRemove.bl_idname, text="Remove", icon='REMOVE')
         column.separator()
         column.operator(CHESTNUTMC_OT_SkinRename.bl_idname, text="Rename", icon='FILE_TICK')
+        column.separator()
+        column.operator("cmc.download_skin", text="Download from ID", icon='IMPORT')
         if not scene.cmc_skin_list_index >= len(scene.cmc_skin_list):
             column.template_icon(icon_value=skin_previews[scene.cmc_skin_list[scene.cmc_skin_list_index].name].icon_id, scale=4.0)
         layout.operator(CHESTNUTMC_OT_SkinApply.bl_idname, text="Apply Skin", icon='CHECKMARK')

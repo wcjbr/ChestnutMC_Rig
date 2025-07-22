@@ -1590,6 +1590,9 @@ class CMC_OT_Switch_R_ARM_FKIK(bpy.types.Operator):
         # fk2ik
         if meum_bone["FK/IK"] == 0:
             if CMC_OT_Switch_IK_FK.arm_fk2ik(self, context, "R"):
+                # 如果开启了自动插帧
+                if bpy.context.scene.tool_settings.use_keyframe_insert_auto:
+                    bpy.ops.cmc.insert_seamless_switch_keyframe(bone_list_select = 2)
                 return {'FINISHED'}
             else:
                 self.report({'ERROR'}, "Fail to switch arm FK to IK")
@@ -1597,6 +1600,8 @@ class CMC_OT_Switch_R_ARM_FKIK(bpy.types.Operator):
         # ik2fk
         elif meum_bone["FK/IK"] == 1:
             if CMC_OT_Switch_IK_FK.arm_ik2fk(self, context, "R"):
+                if bpy.context.scene.tool_settings.use_keyframe_insert_auto:
+                    bpy.ops.cmc.insert_seamless_switch_keyframe(bone_list_select = 2)
                 return {'FINISHED'}
             else:
                 self.report({'ERROR'}, "Fail to switch arm IK to FK")
@@ -1620,6 +1625,8 @@ class CMC_OT_Switch_L_ARM_FKIK(bpy.types.Operator):
         # fk2ik
         if meum_bone["FK/IK"] == 0:
             if CMC_OT_Switch_IK_FK.arm_fk2ik(self, context, "L"):
+                if bpy.context.scene.tool_settings.use_keyframe_insert_auto:
+                    bpy.ops.cmc.insert_seamless_switch_keyframe(bone_list_select = 1)
                 return {'FINISHED'}
             else:
                 self.report({'ERROR'}, "Fail to switch arm FK to IK")
@@ -1627,6 +1634,8 @@ class CMC_OT_Switch_L_ARM_FKIK(bpy.types.Operator):
         # ik2fk
         elif meum_bone["FK/IK"] == 1:
             if CMC_OT_Switch_IK_FK.arm_ik2fk(self, context, "L"):
+                if bpy.context.scene.tool_settings.use_keyframe_insert_auto:
+                    bpy.ops.cmc.insert_seamless_switch_keyframe(bone_list_select = 1)
                 return {'FINISHED'}
             else:
                 self.report({'ERROR'}, "Fail to switch arm IK to FK")
@@ -1650,6 +1659,8 @@ class CMC_OT_Switch_R_LEG_FKIK(bpy.types.Operator):
         # fk2ik
         if meum_bone["FK/IK"] == 0:
             if CMC_OT_Switch_IK_FK.leg_fk2ik(self, context, "R"):
+                if bpy.context.scene.tool_settings.use_keyframe_insert_auto:
+                    bpy.ops.cmc.insert_seamless_switch_keyframe(bone_list_select = 4)
                 return {"FINISHED"}
             else:
                 self.report({"ERROR"}, "Fail to switch leg FK to IK")
@@ -1657,6 +1668,8 @@ class CMC_OT_Switch_R_LEG_FKIK(bpy.types.Operator):
         # ik2fk
         if meum_bone["FK/IK"] == 1:
             if CMC_OT_Switch_IK_FK.leg_ik2fk(self, context, "R"):
+                if bpy.context.scene.tool_settings.use_keyframe_insert_auto:
+                    bpy.ops.cmc.insert_seamless_switch_keyframe(bone_list_select = 4)
                 return {"FINISHED"}
             else:
                 self.report({"ERROR"}, "Fail to switch leg IK to FK")
@@ -1680,6 +1693,8 @@ class CMC_OT_Switch_L_LEG_FKIK(bpy.types.Operator):
         # fk2ik
         if meum_bone["FK/IK"] == 0:
             if CMC_OT_Switch_IK_FK.leg_fk2ik(self, context, "L"):
+                if bpy.context.scene.tool_settings.use_keyframe_insert_auto:
+                    bpy.ops.cmc.insert_seamless_switch_keyframe(bone_list_select = 3)
                 return {"FINISHED"}
             else:
                 self.report({"ERROR"}, "Fail to switch leg FK to IK")
@@ -1687,7 +1702,45 @@ class CMC_OT_Switch_L_LEG_FKIK(bpy.types.Operator):
         # ik2fk
         if meum_bone["FK/IK"] == 1:
             if CMC_OT_Switch_IK_FK.leg_ik2fk(self, context, "L"):
+                if bpy.context.scene.tool_settings.use_keyframe_insert_auto:
+                    bpy.ops.cmc.insert_seamless_switch_keyframe(bone_list_select = 3)
                 return {"FINISHED"}
             else:
                 self.report({"ERROR"}, "Fail to switch leg IK to FK")
                 return {"CANCELLED"}
+
+
+# 插入无缝切换关键帧
+class CMC_OT_Insert_Seamless_Switch_Keyframe(bpy.types.Operator):
+    bl_idname = "cmc.insert_seamless_switch_keyframe"
+    bl_label = "Insert Seamless Switch Keyframe"
+    bl_description = "Insert Seamless Switch Keyframe"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    bone_list_select: bpy.props.IntProperty(default=0) # type: ignore
+
+    @classmethod
+    def poll(cls, context: bpy.types.Context):
+        if context.mode != "POSE":
+            return False
+        return True
+
+    def execute(self, context):
+        frame = bpy.context.scene.frame_current
+        if self.bone_list_select == 1:
+            bone_list = ["control.lower_arm.L", "control.upper_arm.L", "IK.arm.L", "IK_Pole.arm.L"]
+            setting_bone_name = "meum.arm.setting.L"
+        elif self.bone_list_select == 2:
+            bone_list = ["control.lower_arm.R", "control.upper_arm.R", "IK.arm.R", "IK_Pole.arm.R"]
+            setting_bone_name = "meum.arm.setting.R"
+        elif self.bone_list_select == 3:
+            bone_list = ["control.lower_leg.L", "control.upper_leg.L", "IK.leg.L", "IK_Pole.leg.L"]
+            setting_bone_name = "meum.leg.setting.L"
+        elif self.bone_list_select == 4:
+            bone_list = ["control.lower_leg.R", "control.upper_leg.R", "IK.leg.R", "IK_Pole.leg.R"]
+            setting_bone_name = "meum.leg.setting.R"
+        if insert_seamless_ikfk_keyframe(self, context, bone_list, setting_bone_name, frame):
+            return {"FINISHED"}
+        else:
+            self.report({"ERROR"}, "Fail to insert seamless switch keyframe")
+            return {"CANCELLED"}

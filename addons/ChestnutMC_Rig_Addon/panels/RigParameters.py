@@ -59,24 +59,36 @@ def get_rig_parameters(box, context: bpy.types.Context, bone_name: str):
             row.operator("cmc.switch_l_arm_fkik", text="Seamless FK->IK", icon="MODIFIER")
         else:
             row.operator("cmc.switch_l_arm_fkik", text="Seamless IK->FK", icon="MODIFIER")
+        row = box.row()
+        op = row.operator("cmc.insert_seamless_switch_keyframe", text="Insert Keyframe", icon="DECORATE_KEYFRAME")
+        op.bone_list_select = 1
     elif bone.name == "meum.arm.setting.R":
         row = box.row()
         if bone["FK/IK"] == 0:
             row.operator("cmc.switch_r_arm_fkik", text="Seamless FK->IK", icon="MODIFIER")
         else:
             row.operator("cmc.switch_r_arm_fkik", text="Seamless IK->FK", icon="MODIFIER")
+        row = box.row()
+        op = row.operator("cmc.insert_seamless_switch_keyframe", text="Insert Keyframe", icon="DECORATE_KEYFRAME")
+        op.bone_list_select = 2
     elif bone.name == "meum.leg.setting.L":
         row = box.row()
         if bone["FK/IK"] == 0:
             row.operator("cmc.switch_l_leg_fkik", text="Seamless FK->IK", icon="MODIFIER")
         else:
             row.operator("cmc.switch_l_leg_fkik", text="Seamless IK->FK", icon="MODIFIER")
+        row = box.row()
+        op = row.operator("cmc.insert_seamless_switch_keyframe", text="Insert Keyframe", icon="DECORATE_KEYFRAME")
+        op.bone_list_select = 3
     elif bone.name == "meum.leg.setting.R":
         row = box.row()
         if bone["FK/IK"] == 0:
             row.operator("cmc.switch_r_leg_fkik", text="Seamless FK->IK", icon="MODIFIER")
         else:
             row.operator("cmc.switch_r_leg_fkik", text="Seamless IK->FK", icon="MODIFIER")
+        row = box.row()
+        op = row.operator("cmc.insert_seamless_switch_keyframe", text="Insert Keyframe", icon="DECORATE_KEYFRAME")
+        op.bone_list_select = 4
 
 
 # 材质参数绘制方法
