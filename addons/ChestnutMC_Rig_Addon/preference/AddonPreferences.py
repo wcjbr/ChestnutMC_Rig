@@ -83,7 +83,7 @@ class CMC_ImportPreferences(AddonPreferences):
         name="Auto Offset Animation Presets Path",
         default=os.path.abspath(os.path.join(
             os.path.dirname(__file__),
-            "../config/AutoOffsetAnimationPresets"
+            "../assets/AutoOffsetAnimationPresets"
         )),
         subtype='DIR_PATH',
     ) # type: ignore
