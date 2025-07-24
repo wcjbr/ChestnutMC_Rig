@@ -72,12 +72,12 @@ class CMC_UL_AutoOffsetList(bpy.types.UIList):
 
                 nrow = ncolumn.row()
                 nrow.alignment = 'RIGHT'
-                nrow.label(text="Anticipation Pose:")
+                nrow.label(text="Anticipation Pose")
                 nrow.prop(bone, "anticipation_pose_mode", text="")
 
                 nrow = ncolumn.row()
                 nrow.alignment = 'RIGHT'
-                nrow.label(text="Recover Pose:")
+                nrow.label(text="Postponement Pose")
                 nrow.prop(bone, "recover_pose_mode", text="")
             # 面板展开与收起
             row.prop(bone, "meum_expand",

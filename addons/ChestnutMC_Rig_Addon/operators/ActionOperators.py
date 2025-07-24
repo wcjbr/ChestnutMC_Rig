@@ -1079,22 +1079,22 @@ class CHESTNUTMC_OT_CreateAutoOffsetAnimation(bpy.types.Operator):
             for bone in armature.pose.bones:
                 if bone.name in bones_list.keys():
                     index = bones_list[bone.name][0]
-                    if armature.cmc_auto_offset_animation_pose[index].have_start_pose:
-                        # 跳转至预备帧
-                        context.scene.frame_set(bones_list[bone.name][3] + anticipation_pose_offset)
-                        # 清空选中骨骼
-                        bpy.ops.pose.select_all(action='DESELECT')
-                        # 选中当前骨骼
-                        armature.data.bones.active = bone.bone
-                        if armature.cmc_auto_offset_animation_pose[index].anticipation_pose_mode == 'AUTO':
-                            if anticipation_pose_intensity >= 0:
-                                # 推移姿态
-                                bpy.ops.pose.push(factor = anticipation_pose_intensity/100, prev_frame = bones_list[bone.name][3], next_frame = bones_list[bone.name][4] - recover_pose_offset)
-                            else:
-                                # 松弛姿态
-                                bpy.ops.pose.relax(factor = -anticipation_pose_intensity/100, prev_frame = bones_list[bone.name][3], next_frame = bones_list[bone.name][4] - recover_pose_offset)
-                            # 插入关键帧
-                            self.insert_selected_bone_keyframe(bone, bones_list[bone.name][3] + anticipation_pose_offset, "EXTREME")
+                    #if armature.cmc_auto_offset_animation_pose[index].have_start_pose:
+                    # 跳转至预备帧
+                    context.scene.frame_set(bones_list[bone.name][3] + anticipation_pose_offset)
+                    # 清空选中骨骼
+                    bpy.ops.pose.select_all(action='DESELECT')
+                    # 选中当前骨骼
+                    armature.data.bones.active = bone.bone
+                    if armature.cmc_auto_offset_animation_pose[index].anticipation_pose_mode == 'AUTO':
+                        if anticipation_pose_intensity >= 0:
+                            # 推移姿态
+                            bpy.ops.pose.push(factor = anticipation_pose_intensity/100, prev_frame = bones_list[bone.name][3], next_frame = bones_list[bone.name][4] - recover_pose_offset)
+                        else:
+                            # 松弛姿态
+                            bpy.ops.pose.relax(factor = -anticipation_pose_intensity/100, prev_frame = bones_list[bone.name][3], next_frame = bones_list[bone.name][4] - recover_pose_offset)
+                        # 插入关键帧
+                        self.insert_selected_bone_keyframe(bone, bones_list[bone.name][3] + anticipation_pose_offset, "EXTREME")
 
         # 自动创建收尾姿态
         if use_recover_pose:
@@ -1102,22 +1102,22 @@ class CHESTNUTMC_OT_CreateAutoOffsetAnimation(bpy.types.Operator):
             for bone in armature.pose.bones:
                 if bone.name in bones_list.keys():
                     index = bones_list[bone.name][0]
-                    if armature.cmc_auto_offset_animation_pose[index].have_end_pose:
-                        # 跳转至收尾帧
-                        context.scene.frame_set(bones_list[bone.name][4] - recover_pose_offset)
-                        # 清空选中骨骼
-                        bpy.ops.pose.select_all(action='DESELECT')
-                        # 选中当前骨骼
-                        armature.data.bones.active = bone.bone
-                        if armature.cmc_auto_offset_animation_pose[index].recover_pose_mode == 'AUTO':
-                            if recover_pose_intensity >= 0:
-                                # 推移姿态
-                                bpy.ops.pose.push(factor = recover_pose_intensity/100, prev_frame = bones_list[bone.name][3] + anticipation_pose_offset, next_frame = bones_list[bone.name][4])
-                            else:
-                                # 松弛姿态
-                                bpy.ops.pose.relax(factor = -recover_pose_intensity/100, prev_frame = bones_list[bone.name][3] + anticipation_pose_offset, next_frame = bones_list[bone.name][4])
-                            # 插入关键帧
-                            self.insert_selected_bone_keyframe(bone, bones_list[bone.name][4] - recover_pose_offset, "EXTREME")
+                    #if armature.cmc_auto_offset_animation_pose[index].have_end_pose:
+                    # 跳转至收尾帧
+                    context.scene.frame_set(bones_list[bone.name][4] - recover_pose_offset)
+                    # 清空选中骨骼
+                    bpy.ops.pose.select_all(action='DESELECT')
+                    # 选中当前骨骼
+                    armature.data.bones.active = bone.bone
+                    if armature.cmc_auto_offset_animation_pose[index].recover_pose_mode == 'AUTO':
+                        if recover_pose_intensity >= 0:
+                            # 推移姿态
+                            bpy.ops.pose.push(factor = recover_pose_intensity/100, prev_frame = bones_list[bone.name][3] + anticipation_pose_offset, next_frame = bones_list[bone.name][4])
+                        else:
+                            # 松弛姿态
+                            bpy.ops.pose.relax(factor = -recover_pose_intensity/100, prev_frame = bones_list[bone.name][3] + anticipation_pose_offset, next_frame = bones_list[bone.name][4])
+                        # 插入关键帧
+                        self.insert_selected_bone_keyframe(bone, bones_list[bone.name][4] - recover_pose_offset, "EXTREME")
 
         # 跳转至结束帧
         context.scene.frame_set(current_frame)
