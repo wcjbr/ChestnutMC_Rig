@@ -96,7 +96,7 @@ dictionary = {
         ("*", "Auto"): "自动",
         ("*", "Custom"): "自定义",
         ("*", "None"): "无",
-        ("*", "Auto Offset Animation Settings"): "自动错帧动画设置",
+        ("*", "Auto Offset Animation Setting"): "自动错帧动画设置",
         ("*", "Average Action Length"): "平均动作长度",
         ("*", "Keyframe Offset"): "关键帧偏移",
         ("*", "Uniform Offset"): "统一偏移",
