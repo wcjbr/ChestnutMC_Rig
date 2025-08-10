@@ -25,6 +25,8 @@
 
 ## 🔧 使用指南
 
+>视频教程：[https://www.bilibili.com/video/BV12GhPzUEs9/](https://www.bilibili.com/video/BV12GhPzUEs9/)
+
 + ### 导入和保存人模
 
 1. 点击 **“加载库”（Load Library）** 加载可用的人模资源。  
@@ -117,6 +119,8 @@
 ---
 
 ## 🔧 Usage Guide
+
+>Video tutorial: [https://www.bilibili.com/video/BV12GhPzUEs9/](https://www.bilibili.com/video/BV12GhPzUEs9/)
 
 + ### Importing and saving Rigs
 
