@@ -45,7 +45,7 @@ dictionary = {
         ("*", "Left Arm Setting"):  "左手设置",
         ("*", "Right Leg Setting"):  "右脚设置",
         ("*", "Left Leg Setting"):  "左脚设置",
-        ("*", "Adjuster"):  "EEVEE材质参数",
+        ("*", "Adjuster"):  "材质参数",
         ("*", "ChestnutMC_PBR_Shader"):  "Cycles材质参数",
         ("*", "Face Texture"):  "脸部贴图",
         ("*", "Emotion"):  "表情",

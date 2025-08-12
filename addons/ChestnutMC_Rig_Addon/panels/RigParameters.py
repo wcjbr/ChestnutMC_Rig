@@ -92,7 +92,9 @@ def get_rig_parameters(box, context: bpy.types.Context, bone_name: str):
 
 
 # 材质参数绘制方法
+_count = 0
 def get_face_parameters(box, context: bpy.types.Context, material_name: str):
+    global _count
     material = None
 
     armature = Defs.get_cmc_rig(context.active_object)
@@ -110,8 +112,8 @@ def get_face_parameters(box, context: bpy.types.Context, material_name: str):
     try:
         for node in material.node_tree.nodes:
             if node.name in Face_Parameters_nodes[material_name] or node.label in Face_Parameters_nodes[material_name]:
-                if (node.name.startswith("Adjuster") or node.name.startswith("ChestnutMC_EdgeLight")) and bpy.context.scene.render.engine != 'BLENDER_EEVEE_NEXT':
-                    continue
+                #if (node.name.startswith("Adjuster") or node.name.startswith("ChestnutMC_EdgeLight")) and bpy.context.scene.render.engine != 'BLENDER_EEVEE_NEXT':
+                #    continue
                 if node.name.startswith("ChestnutMC_PBR_Shader") and bpy.context.scene.render.engine != 'CYCLES':
                     continue
                 row = box.row()
@@ -126,10 +128,11 @@ def get_face_parameters(box, context: bpy.types.Context, material_name: str):
 
                 newbox = box.box()
                 # 如果为PBR节点
-                if node.name == "ChestnutMC_PBR_Shader" or node.label == "ChestnutMC_PBR_Shader":
+                # 旧版实现方法(v1.0.6及之前)
+                if node.name.startswith("ChestnutMC_PBR_Shader") or node.label.startswith("ChestnutMC_PBR_Shader"):
                     node_tree = bpy.data.node_groups.get(node.node_tree.name)
                     for node in node_tree.nodes:
-                        if node.name == "ChestnutMC_PBR_Shader" or node.label == "ChestnutMC_PBR_Shader":
+                        if node.name.startswith("ChestnutMC_PBR_Shader") or node.label.startswith("ChestnutMC_PBR_Shader"):
                             for inp in node.inputs:
                                 # 如果节点被连接
                                 if inp.is_linked:
@@ -137,7 +140,7 @@ def get_face_parameters(box, context: bpy.types.Context, material_name: str):
                                 else:
                                     newbox.template_node_view(node_tree, node, inp)
                 # 如果节点有输入(非图像节点)，则展示未连接节点
-                elif len(node.inputs) > 1:
+                if len(node.inputs) > 1:
                     for inp in node.inputs:
                         # 如果节点被连接
                         if inp.is_linked:
@@ -150,14 +153,44 @@ def get_face_parameters(box, context: bpy.types.Context, material_name: str):
                 # 如果节点无输入则进入节点组(Adjuster)
                 else:
                     node_tree = bpy.data.node_groups.get(node.node_tree.name)
-                    for out in node_tree.nodes['组输出'].inputs:
-                        # 如果节点有输入
-                        if out.is_linked:
-                            row = newbox.row()
-                            row.alignment = 'RIGHT'
-                            row.label(text=out.name)
-                            row.label(text="Custom Used", icon= "SETTINGS")
-                        else:
-                            newbox.template_node_view(node_tree, node, out)
-    except:
+                    # EEVEE材质切换
+                    EC_Switch = None
+                    EC_Switch_Node = None
+                    PBR_Shader = None
+                    for EC_node in node_tree.nodes:
+                        if EC_node.name.startswith("E/C_Switch"):
+                            EC_Switch = bpy.data.node_groups.get(EC_node.node_tree.name)
+                        if EC_node.name.startswith("ChestnutMC_PBR_Shader"):
+                            PBR_Shader = bpy.data.node_groups.get(EC_node.node_tree.name)
+                    if EC_Switch is not None:
+                        for EC_node in EC_Switch.nodes:
+                            if EC_node.name.startswith("E/C_Switch_Node"):
+                                EC_Switch_Node = EC_node
+                                row = newbox.row()
+                                row.template_node_view(EC_Switch, EC_Switch_Node, EC_Switch_Node.inputs[0])
+                                if bpy.context.scene.render.engine == 'CYCLES':
+                                    row.enabled = False
+                                newbox.separator()
+                    if (EC_Switch_Node is None or EC_Switch_Node.inputs[0].default_value != 1) and bpy.context.scene.render.engine != 'CYCLES':
+                        for out in node_tree.nodes['组输出'].inputs:
+                            # 如果节点有输入
+                            if out.is_linked:
+                                row = newbox.row()
+                                row.alignment = 'RIGHT'
+                                row.label(text=out.name)
+                                row.label(text="Custom Used", icon= "SETTINGS")
+                            else:
+                                newbox.template_node_view(node_tree, node, out)
+                    else:
+                        if PBR_Shader is not None:
+                            for node in PBR_Shader.nodes:
+                                if node.name.startswith("ChestnutMC_PBR_Shader") or node.label.startswith("ChestnutMC_PBR_Shader"):
+                                    for inp in node.inputs:
+                                        # 如果节点被连接
+                                        if inp.is_linked:
+                                            continue
+                                        else:
+                                            newbox.template_node_view(PBR_Shader, node, inp)
+    except Exception as e:
+        print(e)
         pass

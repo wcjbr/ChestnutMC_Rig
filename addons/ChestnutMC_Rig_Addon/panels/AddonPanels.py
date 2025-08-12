@@ -160,8 +160,9 @@ class RigPropertiesPanel(BasePanel, bpy.types.Panel):
             get_face_parameters(box, context, "Face")
             box = layout.box()
             get_face_parameters(box, context, "Skin")
-            box = layout.box()
-            get_face_parameters(box, context, "EdgeLight")
+            if bpy.context.scene.render.engine != 'CYCLES':
+                box = layout.box()
+                get_face_parameters(box, context, "EdgeLight")
 
     @classmethod
     def poll(cls, context: bpy.types.Context):
