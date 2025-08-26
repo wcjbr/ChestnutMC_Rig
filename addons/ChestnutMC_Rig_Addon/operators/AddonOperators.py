@@ -754,6 +754,64 @@ class CMC_OT_RigRename(bpy.types.Operator):
         return {'FINISHED'}
 
 
+# 256 128 64模式切换
+class CHESTNUTMC_OT_SwitchTo128(bpy.types.Operator):
+    '''Switch to 128x128 Skin'''
+    bl_idname = "cmc.switch_to_128"
+    bl_label = "Switch to 128x128"
+    bl_description = "Switch the selected skin to 128x128 mode"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    mode: IntProperty(name="Mode", default=128) # type: ignore
+
+    @classmethod
+    def poll(cls, context: bpy.types.Context):
+        if context.active_object is not None:
+            return check_cmc_rig(context.active_object)
+        return False
+
+    def execute(self, context: bpy.types.Context):
+        selected_obj = context.active_object
+
+        if check_cmc_rig(selected_obj):
+            # 获取骨骼
+            selected_rig = get_cmc_rig(selected_obj)
+            if selected_rig is None:
+                self.report({"ERROR"}, "Connot find ChestnutMC rig!")
+                return {"CANCELLED"}
+
+            for child in selected_rig.children:
+                if child.type == 'MESH' and child.name.startswith("preview"):
+                    selected_rig = child
+                    break
+
+            # 切换模式
+            for mod in selected_rig.modifiers:
+                if mod.type == 'NODES' and mod.name == 'Delete Alpha Face':
+                    node_group = mod.node_group
+                    for node in node_group.nodes:
+                        if node.name == 'CMC_SkinSubdivide':
+                            if self.mode <= 64:
+                                node.inputs[1].default_value = 0
+                                self.report({'INFO'}, "Switched to 64x64 mode")
+                            elif self.mode <= 128:
+                                node.inputs[1].default_value = 1
+                                self.report({'INFO'}, "Switched to 128x128 mode")
+                            elif self.mode <= 256:
+                                node.inputs[1].default_value = 2
+                                self.report({'INFO'}, "Switched to 256x256 mode")
+                            else:
+                                self.report({'WARNING'}, "Invalid mode")
+                                return {'CANCELLED'}
+                            return {'FINISHED'}
+
+            self.report({'ERROR'}, "Connot find Geometry Node modifier!")
+            return {'CANCELLED'}
+
+        self.report({'ERROR'}, "Invalid rig selected")
+        return {'CANCELLED'}
+
+
 
 
 #*****************************************************
@@ -1090,6 +1148,11 @@ class CHESTNUTMC_OT_SkinApply(bpy.types.Operator):
     # 变更几何节点贴图
     def change_geo_texture(self, act_object, texture):
         context = bpy.context
+
+        # 获取贴图尺寸
+        width, height = texture.size
+        # 调整贴图模式
+        bpy.ops.cmc.switch_to_128(mode=width)
 
         for modifier in act_object.modifiers:
             # 前缀为Delete Alpha Face的几何节点修改器

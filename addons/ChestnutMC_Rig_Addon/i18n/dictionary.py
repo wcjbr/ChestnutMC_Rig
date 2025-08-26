@@ -194,6 +194,10 @@ dictionary = {
         ("*", "Must be an armature!"): "必须是骨架！",
         ("*", "No bone in list!"): "列表中没有骨骼！",
         ("*", "Bone not found: {}"): "未找到骨骼：{}",
+        ("*", "Switched to 64x64 mode"): "已切换到 64x64 模式",
+        ("*", "Switched to 128x128 mode"): "已切换到 128x128 模式",
+        ("*", "Switched to 256x256 mode"): "已切换到 256x256 模式",
+        ("*", "Connot find Geometry Node modifier!"): "无法找到几何节点修改器！",
     }
 }
 
