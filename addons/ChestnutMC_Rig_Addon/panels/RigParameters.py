@@ -46,13 +46,30 @@ def get_rig_parameters(box, context: bpy.types.Context, bone_name: str):
     # 绘制参数
     for prop_name in custom_props:
         # 验证属性值是否为数字
-        if type(bone[prop_name]) not in [int, float]:
+        if type(bone[prop_name]) not in [bool, int, float]:
             continue
         if prop_name == "cmc_bone_expand":
             continue
         row = box.row()
-        row.prop(bone, '["%s"]' % prop_name, text=prop_name)
-
+        # 更改文本
+        text_c = prop_name
+        if text_c == "FK/IK":
+            if bone["FK/IK"] == 0:
+                text_c = "FK"
+                row.alert = True
+            else:
+                text_c = "IK"
+                row.alert = False
+        if text_c == "男/女":
+            if bone["男/女"] == 0:
+                text_c = "粗手臂"
+                row.alert = True
+            else:
+                text_c = "细手臂"
+                row.alert = False
+        #row.label(text=prop_name)
+        row.prop(bone, '["%s"]' % prop_name, text=text_c, emboss=True, icon="CHECKMARK" if bone[prop_name] else "DOT", slider=True)
+    # 无缝切换FK/IK
     if bone.name == "meum.arm.setting.L":
         row = box.row()
         if bone["FK/IK"] == 0:
@@ -166,12 +183,17 @@ def get_face_parameters(box, context: bpy.types.Context, material_name: str):
                         for EC_node in EC_Switch.nodes:
                             if EC_node.name.startswith("E/C_Switch_Node"):
                                 EC_Switch_Node = EC_node
-                                row = newbox.row()
-                                row.template_node_view(EC_Switch, EC_Switch_Node, EC_Switch_Node.inputs[0])
-                                if bpy.context.scene.render.engine == 'CYCLES':
-                                    row.enabled = False
-                                newbox.separator()
+                                # 绘制E/C_Switch节点
+                                #row = newbox.row()
+                                #row.template_node_view(EC_Switch, EC_Switch_Node, EC_Switch_Node.inputs[0])
+                                #if bpy.context.scene.render.engine == 'CYCLES':
+                                #    row.enabled = False
+                                #newbox.separator()
                     if (EC_Switch_Node is None or EC_Switch_Node.inputs[0].default_value != 1) and bpy.context.scene.render.engine != 'CYCLES':
+                        # 材质切换按钮
+                        row = newbox.row()
+                        row.operator("cmc.switch_npr_pbr", text="NPR Shader", icon="NODE_MATERIAL")
+                        newbox.separator()
                         for out in node_tree.nodes['组输出'].inputs:
                             # 如果节点有输入
                             if out.is_linked:
@@ -182,6 +204,11 @@ def get_face_parameters(box, context: bpy.types.Context, material_name: str):
                             else:
                                 newbox.template_node_view(node_tree, node, out)
                     else:
+                        # 材质切换按钮
+                        if bpy.context.scene.render.engine != 'CYCLES':
+                            row = newbox.row()
+                            row.operator("cmc.switch_npr_pbr", text="PBR Shader", icon="NODE_MATERIAL")
+                            newbox.separator()
                         if PBR_Shader is not None:
                             for node in PBR_Shader.nodes:
                                 if node.name.startswith("ChestnutMC_PBR_Shader") or node.label.startswith("ChestnutMC_PBR_Shader"):

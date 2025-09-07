@@ -150,7 +150,7 @@ class CHESTNUTMC_OT_Merge_Assets(bpy.types.Operator):
             ("SKIP", "Skip Existing items", "Skip existing items"),
             ("RENAME", "Rename Existing items", "Rename existing items")
         ],
-        default="RENAME"
+        default="SKIP"
     ) # type: ignore
 
     filepath: bpy.props.StringProperty(subtype="FILE_PATH") # type: ignore
@@ -1802,3 +1802,80 @@ class CMC_OT_Insert_Seamless_Switch_Keyframe(bpy.types.Operator):
         else:
             self.report({"ERROR"}, "Fail to insert seamless switch keyframe")
             return {"CANCELLED"}
+
+
+
+
+#*****************************************************
+#*****************************************************
+#******************** 材质相关操作 ********************
+#*****************************************************
+#*****************************************************
+
+# NPR/PBR材质切换
+class CMC_OT_Switch_NPR_PBR(bpy.types.Operator):
+    bl_idname = "cmc.switch_npr_pbr"
+    bl_label = "Switch NPR/PBR"
+    bl_description = "Switch NPR/PBR"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @classmethod
+    def poll(cls, context: bpy.types.Context):
+        if check_cmc_rig(context.object):
+            return True
+        return False
+
+    def execute(self, context):
+        armature = get_cmc_rig(context.object)
+        if armature is None:
+            self.report({"ERROR"}, "Connot find ChestnutMC rig!")
+            return {"CANCELLED"}
+
+        # 获取preview网格
+        preview_mesh = None
+        for child in armature.children:
+            if child.type == 'MESH' and child.name.startswith("preview"):
+                preview_mesh = child
+                break
+        if preview_mesh is None:
+            self.report({"ERROR"}, "Active object is not a valid ChestnutMC Rig.")
+            return {"CANCELLED"}
+
+        # 查找指定材质
+        target_material = None
+        for material in preview_mesh.material_slots:
+            if material.material.name.startswith("Skin"):
+                target_material = material.material
+                break
+
+        node = None
+        for nd in target_material.node_tree.nodes:
+            if nd.name.startswith("Adjuster"):
+                node = nd
+                break
+        if node is None:
+            self.report({"ERROR"}, "Active object is not a valid ChestnutMC Rig.")
+            return {"CANCELLED"}
+        node_tree = bpy.data.node_groups.get(node.node_tree.name)
+
+        EC_Switch = None
+        EC_Switch_Node = None
+        for EC_node in node_tree.nodes:
+            if EC_node.name.startswith("E/C_Switch"):
+                EC_Switch = bpy.data.node_groups.get(EC_node.node_tree.name)
+                break
+
+        if EC_Switch is not None:
+            for EC_node in EC_Switch.nodes:
+                if EC_node.name.startswith("E/C_Switch_Node"):
+                    EC_Switch_Node = EC_node
+        try:
+            if EC_Switch_Node.inputs[0].default_value == 1:
+                EC_Switch_Node.inputs[0].default_value = 0
+            else:
+                EC_Switch_Node.inputs[0].default_value = 1
+        except Exception as e:
+            self.report({"ERROR"}, "Old version of ChestnutMC Rig detected. Please update the rig to the latest version.")
+            return {"CANCELLED"}
+
+        return {"FINISHED"}

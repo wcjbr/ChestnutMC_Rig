@@ -198,6 +198,9 @@ dictionary = {
         ("*", "Switched to 128x128 mode"): "已切换到 128x128 模式",
         ("*", "Switched to 256x256 mode"): "已切换到 256x256 模式",
         ("*", "Connot find Geometry Node modifier!"): "无法找到几何节点修改器！",
+        ("Operator", "PBR Shader"): "PBR 材质",
+        ("Operator", "NPR Shader"): "NPR 材质",
+        ("*", "Old version of ChestnutMC Rig detected. Please update the rig to the latest version."): "检测到旧版本的 ChestnutMC 人模。请将人模更新到最新版本。",
     }
 }
 
