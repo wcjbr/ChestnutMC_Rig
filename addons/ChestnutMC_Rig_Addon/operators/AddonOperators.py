@@ -1540,7 +1540,7 @@ class CMC_OT_Switch_IK_FK(bpy.types.Operator):
         # 切换ikfk参数
         for bone in context.active_object.pose.bones:
             if bone.name == meum_bone_name:
-                bone["FK/IK"] = 1
+                bone["FK/IK"] = True
                 bone["IK极向独立控制"] = 0
             if bone.name == pole_bone_name:
                 # 极向变换归零
@@ -1564,7 +1564,7 @@ class CMC_OT_Switch_IK_FK(bpy.types.Operator):
         # 切换ikfk参数
         for bone in context.active_object.pose.bones:
             if bone.name == meum_bone_name:
-                bone["FK/IK"] = 0
+                bone["FK/IK"] = False
                 context.active_bone.hide = False
         return True
 
@@ -1585,7 +1585,7 @@ class CMC_OT_Switch_IK_FK(bpy.types.Operator):
         # 切换ikfk参数
         for bone in context.active_object.pose.bones:
             if bone.name == meum_bone_name:
-                bone["FK/IK"] = 1
+                bone["FK/IK"] = True
                 #bone["IK极向独立控制"] = 0
             # control.ankle旋转归零
             if bone.name == control_ankle_name:
@@ -1611,7 +1611,7 @@ class CMC_OT_Switch_IK_FK(bpy.types.Operator):
         # 切换ikfk参数
         for bone in context.active_object.pose.bones:
             if bone.name == meum_bone_name:
-                bone["FK/IK"] = 0
+                bone["FK/IK"] = False
                 context.active_bone.hide = False
             # ik控制骨复位
             if bone.name == ik_bone_name:
