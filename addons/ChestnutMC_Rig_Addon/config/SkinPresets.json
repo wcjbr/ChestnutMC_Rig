@@ -291,10 +291,10 @@
         },
         "porperty": {
             "meum.body.setting": {
-                "男/女": 1
+                "男/女": true
             },
             "meum.face.mouth.setting": {
-                "睫毛": 1
+                "睫毛": true
             }
         },
         "Eye": {
@@ -702,10 +702,10 @@
         },
         "porperty": {
             "meum.body.setting": {
-                "男/女": 1
+                "男/女": true
             },
             "meum.face.mouth.setting": {
-                "睫毛": 1
+                "睫毛": true
             }
         },
         "Eye": {
@@ -1113,10 +1113,10 @@
         },
         "porperty": {
             "meum.body.setting": {
-                "男/女": 0
+                "男/女": false
             },
             "meum.face.mouth.setting": {
-                "睫毛": 0
+                "睫毛": false
             }
         },
         "Eye": {

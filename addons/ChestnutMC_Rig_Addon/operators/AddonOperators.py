@@ -1039,7 +1039,10 @@ class CHESTNUTMC_OT_SkinApply(bpy.types.Operator):
         for bone_name, prop_name in property_preset.items():
             for prop_name, prop_value in prop_name.items():
                 # 骨骼属性赋值
-                parent_armature.pose.bones[bone_name][prop_name] = prop_value
+                if isinstance(parent_armature.pose.bones[bone_name][prop_name], bool):
+                    parent_armature.pose.bones[bone_name][prop_name] = True if prop_value else False
+                else:
+                    parent_armature.pose.bones[bone_name][prop_name] = prop_value
 
         ##### 应用Eye预设 #####
         eye_preset = skin_presets["Eye"]
