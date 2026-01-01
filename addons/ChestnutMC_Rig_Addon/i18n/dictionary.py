@@ -111,6 +111,8 @@ dictionary = {
         ("*", "Rig name"): "人模名称",
         ("*", "New name"): "新名称",
         ("*", "Are you sure you want to remove skin: {name}?"): "确定要删除皮肤：{name}？",
+        ("*", "Apply Selected Bones"): "应用选中骨骼",
+        ("*", "Apply All Bones"): "应用所有骨骼",
         # 提示信息
         ("*", "Asset library updated!"): "资产库已更新！",
         ("*", "Start pose saved successfully!"): "起始姿态保存成功！",
