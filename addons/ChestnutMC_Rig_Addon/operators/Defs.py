@@ -413,3 +413,39 @@ def load_auto_offset_animation_preset_list(self, context: bpy.types.Context):
     _CMC_AUTOOFFSET_PERSETS = preset_files
 
     return _CMC_AUTOOFFSET_PERSETS
+
+
+# 获取选中骨骼列表（兼容Blender 5.0）
+def get_selected_bone_names(self, armature: bpy.types.Object):
+    '''获取选中骨骼列表（兼容Blender 5.0）'''
+    blender_version = bpy.app.version
+    if blender_version >= (5, 0, 0):
+        selected_bones = [bone.name for bone in armature.pose.bones if bone.select]
+    else:
+        selected_bones = [bone.name for bone in armature.pose.bones if bone.bone.select]
+    return selected_bones
+
+
+# 判断骨骼是否被选中（兼容Blender 5.0）
+def is_bone_selected(self, armature: bpy.types.Object, bone_name: str):
+    '''判断骨骼是否被选中（兼容Blender 5.0）'''
+    blender_version = bpy.app.version
+    bone = armature.pose.bones.get(bone_name)
+    if bone is None:
+        return False
+    if blender_version >= (5, 0, 0):
+        return bone.select
+    else:
+        return bone.bone.select
+
+
+# 判断骨骼是否被选中（兼容Blender 5.0）
+def is_bone_selected(self, bone: bpy.types.PoseBone):
+    '''判断骨骼是否被选中（兼容Blender 5.0）'''
+    blender_version = bpy.app.version
+    if bone is None:
+        return False
+    if blender_version >= (5, 0, 0):
+        return bone.select
+    else:
+        return bone.bone.select

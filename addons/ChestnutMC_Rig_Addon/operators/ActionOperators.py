@@ -140,7 +140,7 @@ class CHESTNUTMC_OT_ApplyStartPose(bpy.types.Operator):
         for pose in context.active_object.cmc_auto_offset_animation_pose:
             bone = context.active_object.pose.bones.get(pose.bone_name)
             if pose.have_start_pose:
-                if self.mode == 'ALL' or (self.mode == 'SELECTED' and bone.bone.select):
+                if self.mode == 'ALL' or (self.mode == 'SELECTED' and is_bone_selected(self, bone)):
                     # 获取骨骼矩阵
                     matrix = pose.start_pose
                     bone.matrix_basis = matrix
@@ -187,7 +187,7 @@ class CHESTNUTMC_OT_ApplyEndPose(bpy.types.Operator):
         for pose in context.active_object.cmc_auto_offset_animation_pose:
             bone = context.active_object.pose.bones.get(pose.bone_name)
             if pose.have_end_pose:
-                if self.mode == 'ALL' or (self.mode == 'SELECTED' and bone.bone.select):
+                if self.mode == 'ALL' or (self.mode == 'SELECTED' and is_bone_selected(self, bone)):
                     # 获取骨骼矩阵
                     matrix = pose.end_pose
                     bone.matrix_basis = matrix
@@ -233,7 +233,7 @@ class CHESTNUTMC_OT_ApplyAnticipationPose(bpy.types.Operator):
         for pose in context.active_object.cmc_auto_offset_animation_pose:
             bone = context.active_object.pose.bones.get(pose.bone_name)
             if pose.have_anticipation_pose:
-                if self.mode == 'ALL' or (self.mode == 'SELECTED' and bone.bone.select):
+                if self.mode == 'ALL' or (self.mode == 'SELECTED' and is_bone_selected(self, bone)):
                     # 获取骨骼矩阵
                     matrix = pose.anticipation_pose
                     bone.matrix_basis = matrix
@@ -282,7 +282,7 @@ class CHESTNUTMC_OT_ApplyRecoverPose(bpy.types.Operator):
                 self.report({'WARNING'}, f"Bone {pose.bone_name} not found in the armature.")
                 continue
             if pose.have_recover_pose:
-                if self.mode == 'ALL' or (self.mode == 'SELECTED' and bone.bone.select):
+                if self.mode == 'ALL' or (self.mode == 'SELECTED' and is_bone_selected(self, bone)):
                     # 获取骨骼矩阵
                     matrix = pose.recover_pose
                     bone.matrix_basis = matrix
@@ -450,7 +450,7 @@ class CHESTNUTMC_OT_ApplyIntermediatePose(bpy.types.Operator):
                 self.report({'WARNING'}, f"Bone {pose.bone_name} not found in the armature.")
                 continue
             else:
-                if self.mode == 'ALL' or (self.mode == 'SELECTED' and bone.bone.select):
+                if self.mode == 'ALL' or (self.mode == 'SELECTED' and is_bone_selected(self, bone)):
                     # 获取骨骼矩阵
                     matrix = pose.pose
                     bone.matrix_basis = matrix
@@ -587,7 +587,8 @@ class CHESTNUTMC_OT_Add_Bone_To_AutoOffset_List(bpy.types.Operator):
             self.report({"ERROR"}, "Active object must be an armature!")
             return{"CANCELLED"}
 
-        selected_bones = [bone.name for bone in armature.pose.bones if bone.bone.select]
+        # 获取选中骨骼列表
+        selected_bones = get_selected_bone_names(self, armature)
 
         for bone in armature.cmc_auto_offset_animation_pose:
             if bone.bone_name in selected_bones:
@@ -689,7 +690,11 @@ class CHESTNUTMC_OT_Select_All_Bones_inList(bpy.types.Operator):
         for pose in armature.cmc_auto_offset_animation_pose:
             bone = armature.pose.bones.get(pose.bone_name)
             if bone:
-                bone.bone.select = True
+                # 检查版本
+                if bpy.app.version >= (5, 0, 0):
+                    bone.select = True
+                else:
+                    bone.bone.select = True
 
         return{"FINISHED"}
 
@@ -814,7 +819,7 @@ class CHESTNUTMC_OT_ChangeAnticipationPoseMode(bpy.types.Operator):
 
         bone_list = []
         if self.apply_range == "SELECTED":
-            bone_list = [bone.name for bone in armature.pose.bones if bone.bone.select]
+            bone_list = [bone.name for bone in armature.pose.bones if is_bone_selected(self, bone)]
         for pose_bone in armature.cmc_auto_offset_animation_pose:
             if self.apply_range == "ALL" or pose_bone.bone_name in bone_list:
                 pose_bone.anticipation_pose_mode = self.mode
@@ -867,7 +872,7 @@ class CHESTNUTMC_OT_ChangeRecoverPoseMode(bpy.types.Operator):
 
         bone_list = []
         if self.apply_range == "SELECTED":
-            bone_list = [bone.name for bone in armature.pose.bones if bone.bone.select]
+            bone_list = [bone.name for bone in armature.pose.bones if is_bone_selected(self, bone)]
         for pose_bone in armature.cmc_auto_offset_animation_pose:
             if self.apply_range == "ALL" or pose_bone.bone_name in bone_list:
                 pose_bone.recover_pose_mode = self.mode
