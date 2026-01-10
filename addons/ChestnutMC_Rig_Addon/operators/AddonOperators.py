@@ -787,7 +787,7 @@ class CHESTNUTMC_OT_SwitchTo128(bpy.types.Operator):
 
             # 切换模式
             for mod in selected_rig.modifiers:
-                if mod.type == 'NODES' and mod.name == 'Delete Alpha Face':
+                if mod.type == 'NODES' and mod.name.startswith('Delete Alpha Face'):
                     node_group = mod.node_group
                     for node in node_group.nodes:
                         if node.name == 'CMC_SkinSubdivide':

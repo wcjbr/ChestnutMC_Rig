@@ -388,17 +388,6 @@ class ActionManagerPanel(BasePanel, bpy.types.Panel):
             row.use_property_decorate = False
             row.prop(pchan, "lock_scale", text="", emboss=False, icon='DECORATE_UNLOCKED')
 
-        elif context.edit_bone:
-            bone = context.edit_bone
-            col = layout.column()
-            col.prop(bone, "head")
-            col.prop(bone, "tail")
-
-            col = layout.column()
-            col.prop(bone, "roll")
-            col.prop(bone, "length")
-            col.prop(bone, "lock")
-
 
         #* 选择集面板
         layout = self.layout
